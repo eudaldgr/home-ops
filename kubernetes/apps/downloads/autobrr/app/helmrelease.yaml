@@ -27,6 +27,19 @@ spec:
               AUTOBRR__METRICS_PORT: &metricsPort 9094
               AUTOBRR__CHECK_FOR_UPDATES: false
               AUTOBRR__LOG_LEVEL: INFO
+              AUTOBRR__OIDC_ENABLED: true
+              AUTOBRR__OIDC_ISSUER: https://auth.eudald.gr
+              AUTOBRR__OIDC_CLIENT_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: "{{ .Release.Name }}-oidc"
+                    key: client-id
+              AUTOBRR__OIDC_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: "{{ .Release.Name }}-oidc"
+                    key: client-secret
+              AUTOBRR__OIDC_REDIRECT_URL: https://{{ .Release.Name }}.eudald.gr/api/auth/oidc/callback
             probes:
               liveness:
                 enabled: true

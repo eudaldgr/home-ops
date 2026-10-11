@@ -73,8 +73,6 @@ spec:
             allowOwnAccountEdit: true
             requireUserEmail: true
             emailsVerified: false
-            signupDefaultUserGroupIds:
-              - 028f8327-06e1-4ba4-bff6-4ab9cbd3b00e # users
           webauthn:
             userVerification: required
             allowSyncedPasskeys: true

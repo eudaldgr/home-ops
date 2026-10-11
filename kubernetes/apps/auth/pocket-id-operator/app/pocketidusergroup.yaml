@@ -8,7 +8,33 @@ spec:
   friendlyName: Admins
   users:
     usernames:
+      - admin
+---
+apiVersion: pocketid.internal/v1alpha1
+kind: PocketIDUserGroup
+metadata:
+  name: home-ops
+spec:
+  name: home-ops
+  friendlyName: Home Ops
+  users:
+    usernames:
       - eudaldgr
+  allowedOIDCClients:
+    - name: autobrr
+      namespace: downloads
+    - name: lidarr
+      namespace: downloads
+    - name: prowlarr
+      namespace: downloads
+    - name: qui
+      namespace: downloads
+    - name: radarr
+      namespace: downloads
+    - name: sonarr
+      namespace: downloads
+    - name: torrent
+      namespace: downloads
 ---
 apiVersion: pocketid.internal/v1alpha1
 kind: PocketIDUserGroup
@@ -17,6 +43,14 @@ metadata:
 spec:
   name: family
   friendlyName: Family
+  users:
+    usernames:
+      - eudaldgr
+  allowedOIDCClients:
+    - name: actual
+      namespace: default
+    - name: memos
+      namespace: default
 ---
 apiVersion: pocketid.internal/v1alpha1
 kind: PocketIDUserGroup
@@ -25,3 +59,19 @@ metadata:
 spec:
   name: relatives
   friendlyName: Relatives
+---
+apiVersion: pocketid.internal/v1alpha1
+kind: PocketIDUserGroup
+metadata:
+  name: friends
+spec:
+  name: friends
+  friendlyName: Friends
+---
+apiVersion: pocketid.internal/v1alpha1
+kind: PocketIDUserGroup
+metadata:
+  name: users
+spec:
+  name: users
+  friendlyName: Users

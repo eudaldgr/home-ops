@@ -20,10 +20,20 @@ spec:
               repository: ghcr.io/autobrr/qui
               tag: v1.30.0@sha256:1172ca40283330445d61189263a65a31ba703770a230b9e2a913f6e57bc2dd23
             env:
-              # Login is handled by pocket-id at Envoy; only trust requests coming from the cluster
-              QUI__AUTH_DISABLED: true
-              QUI__I_ACKNOWLEDGE_THIS_IS_A_BAD_IDEA: true
-              QUI__AUTH_DISABLED_ALLOWED_CIDRS: 10.42.0.0/16
+              QUI__OIDC_ENABLED: true
+              QUI__OIDC_ISSUER: https://auth.eudald.gr
+              QUI__OIDC_CLIENT_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: "{{ .Release.Name }}-oidc"
+                    key: client-id
+              QUI__OIDC_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: "{{ .Release.Name }}-oidc"
+                    key: client-secret
+              QUI__OIDC_REDIRECT_URL: https://{{ .Release.Name }}.eudald.gr/api/auth/oidc/callback
+              QUI__OIDC_DISABLE_BUILT_IN_LOGIN: true
               QUI__HOST: 0.0.0.0
               QUI__PORT: &port 80
               QUI__METRICS_ENABLED: true

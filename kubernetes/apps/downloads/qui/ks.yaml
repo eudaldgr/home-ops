@@ -8,12 +8,13 @@ spec:
   components:
     - ../../../../components/kopiur/backup
     - ../../../../components/zeroscaler
-    - ../../../../components/sso
+    - ../../../../components/oidc
   interval: 1h
   path: ./kubernetes/apps/downloads/qui/app
   postBuild:
     substitute:
       APP: qui
+      SSO_CALLBACK: /api/auth/oidc/callback
   prune: true
   sourceRef:
     kind: GitRepository
