@@ -5,7 +5,6 @@ metadata:
   name: synology
 spec:
   name: Synology
-  launchUrl: https://ds920plus.lan.eudald.gr:5551
   callbackUrls:
     - https://calendar.eudald.gr
     - https://calendar.eudald.gr/
@@ -20,6 +19,8 @@ spec:
   logoutCallbackUrls:
     - https://ds920plus.lan.eudald.gr:5551
   skipConsent: true
+  logo:
+    nameOverride: synology-dsm
   allowedUserGroups:
     - name: admins
       namespace: auth
@@ -32,3 +33,91 @@ spec:
     keys:
       clientID: client-id
       clientSecret: client-secret
+---
+apiVersion: pocketid.internal/v1alpha1
+kind: PocketIDOIDCClient
+metadata:
+  name: synology-photos
+spec:
+  name: Photos
+  launchUrl: https://photos.eudald.gr
+  callbackUrls:
+    - https://photos.eudald.gr
+  isPublic: true
+  logo:
+    nameOverride: synology-photos
+  allowedUserGroups:
+    - name: admins
+      namespace: auth
+    - name: family
+      namespace: auth
+    - name: relatives
+      namespace: auth
+  secret:
+    enabled: false
+---
+apiVersion: pocketid.internal/v1alpha1
+kind: PocketIDOIDCClient
+metadata:
+  name: synology-drive
+spec:
+  name: Drive
+  launchUrl: https://drive.eudald.gr
+  callbackUrls:
+    - https://drive.eudald.gr
+  isPublic: true
+  logo:
+    nameOverride: synology-drive
+  allowedUserGroups:
+    - name: admins
+      namespace: auth
+    - name: family
+      namespace: auth
+    - name: relatives
+      namespace: auth
+  secret:
+    enabled: false
+---
+apiVersion: pocketid.internal/v1alpha1
+kind: PocketIDOIDCClient
+metadata:
+  name: synology-calendar
+spec:
+  name: Calendar
+  launchUrl: https://calendar.eudald.gr
+  callbackUrls:
+    - https://calendar.eudald.gr
+  isPublic: true
+  logo:
+    nameOverride: synology-calendar
+  allowedUserGroups:
+    - name: admins
+      namespace: auth
+    - name: family
+      namespace: auth
+    - name: relatives
+      namespace: auth
+  secret:
+    enabled: false
+---
+apiVersion: pocketid.internal/v1alpha1
+kind: PocketIDOIDCClient
+metadata:
+  name: synology-contacts
+spec:
+  name: Contacts
+  launchUrl: https://contacts.eudald.gr
+  callbackUrls:
+    - https://contacts.eudald.gr
+  isPublic: true
+  logo:
+    nameOverride: synology-contacts
+  allowedUserGroups:
+    - name: admins
+      namespace: auth
+    - name: family
+      namespace: auth
+    - name: relatives
+      namespace: auth
+  secret:
+    enabled: false
