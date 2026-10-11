@@ -7,4 +7,5 @@ resources:
   - ./infisicalstaticsecret.yaml
   - ./networkpolicy.yaml
   - ./ocirepository.yaml
+  - ./pocketidoidcclient.yaml
   - ./pocketidusergroup.yaml

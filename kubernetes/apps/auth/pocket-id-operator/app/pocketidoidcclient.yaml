@@ -1,0 +1,34 @@
+---
+apiVersion: pocketid.internal/v1alpha1
+kind: PocketIDOIDCClient
+metadata:
+  name: synology
+spec:
+  name: Synology
+  launchUrl: https://ds920plus.lan.eudald.gr:5551
+  callbackUrls:
+    - https://calendar.eudald.gr
+    - https://calendar.eudald.gr/
+    - https://contacts.eudald.gr
+    - https://contacts.eudald.gr/
+    - https://drive.eudald.gr
+    - https://drive.eudald.gr/
+    - https://ds920plus.lan.eudald.gr:5551
+    - https://ds920plus.lan.eudald.gr:5551/
+    - https://photos.eudald.gr
+    - https://photos.eudald.gr/
+  logoutCallbackUrls:
+    - https://ds920plus.lan.eudald.gr:5551
+  skipConsent: true
+  allowedUserGroups:
+    - name: admins
+      namespace: auth
+    - name: family
+      namespace: auth
+    - name: relatives
+      namespace: auth
+  secret:
+    name: synology-oidc
+    keys:
+      clientID: client-id
+      clientSecret: client-secret
