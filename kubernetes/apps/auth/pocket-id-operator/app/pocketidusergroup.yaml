@@ -51,6 +51,8 @@ spec:
       namespace: default
     - name: memos
       namespace: default
+    - name: hass
+      namespace: home-automation
 ---
 apiVersion: pocketid.internal/v1alpha1
 kind: PocketIDUserGroup

@@ -7,6 +7,7 @@ metadata:
 spec:
   components:
     - ../../../../components/kopiur/backup
+    - ../../../../components/oidc
   dependsOn:
     - name: multus-networks
       namespace: kube-system
@@ -17,6 +18,9 @@ spec:
       APP: home-assistant
       KOPIUR_PGID: "1000"
       KOPIUR_PUID: "1000"
+      SSO_APP: hass
+      SSO_CALLBACK: /auth/oidc/callback
+      SSO_LOGO: home-assistant
   prune: true
   sourceRef:
     kind: GitRepository

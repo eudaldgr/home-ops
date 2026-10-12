@@ -21,6 +21,16 @@ spec:
               tag: 2026.9.4@sha256:cd5ffc0a3bc873b35f20189ef22ee7ee9e8875fe666928dfee263cd464cc053d
             env:
               TZ: Europe/Madrid
+              HASS_OIDC_CLIENT_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: hass-oidc
+                    key: client-id
+              HASS_OIDC_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: hass-oidc
+                    key: client-secret
             probes:
               liveness:
                 enabled: true
