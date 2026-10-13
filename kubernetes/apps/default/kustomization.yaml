@@ -11,6 +11,7 @@ resources:
   - ./namespace.yaml
   - ./actual/ks.yaml
   - ./bentopdf/ks.yaml
+  - ./immich/ks.yaml
   - ./it-tools/ks.yaml
   - ./memos/ks.yaml
   - ./searxng/ks.yaml
