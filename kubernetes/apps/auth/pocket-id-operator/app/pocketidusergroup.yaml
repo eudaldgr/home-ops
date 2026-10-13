@@ -55,6 +55,8 @@ spec:
       namespace: default
     - name: hass
       namespace: home-automation
+    - name: immich
+      namespace: default
 ---
 apiVersion: pocketid.internal/v1alpha1
 kind: PocketIDUserGroup
@@ -63,6 +65,9 @@ metadata:
 spec:
   name: relatives
   friendlyName: Relatives
+  allowedOIDCClients:
+    - name: immich
+      namespace: default
 ---
 apiVersion: pocketid.internal/v1alpha1
 kind: PocketIDUserGroup
