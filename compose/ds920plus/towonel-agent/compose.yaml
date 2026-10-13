@@ -10,10 +10,10 @@ services:
       TOWONEL_AGENT_HEALTH_LISTEN_ADDR: 127.0.0.1:19090
       TOWONEL_AGENT_SERVICES: |
         [
-          {"hostname":"calendar.eudald.gr","origin":"127.0.0.1:20003","proxy_protocol":"none"},
-          {"hostname":"contacts.eudald.gr","origin":"127.0.0.1:25556","proxy_protocol":"none"},
-          {"hostname":"drive.eudald.gr","origin":"127.0.0.1:10003","proxy_protocol":"none"},
-          {"hostname":"photos.eudald.gr","origin":"127.0.0.1:5443","proxy_protocol":"none"}
+          {"hostname":"calendar.eudald.gr","origin":"127.0.0.1:443","proxy_protocol":"none"},
+          {"hostname":"contacts.eudald.gr","origin":"127.0.0.1:443","proxy_protocol":"none"},
+          {"hostname":"drive.eudald.gr","origin":"127.0.0.1:443","proxy_protocol":"none"},
+          {"hostname":"photos.eudald.gr","origin":"127.0.0.1:443","proxy_protocol":"none"}
         ]
       TOWONEL_AGENT_TCP_SERVICES: |
         [
