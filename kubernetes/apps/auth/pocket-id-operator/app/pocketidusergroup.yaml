@@ -9,6 +9,9 @@ spec:
   users:
     usernames:
       - admin
+  customClaims:
+    - key: immich_role
+      value: admin
 ---
 apiVersion: pocketid.internal/v1alpha1
 kind: PocketIDUserGroup
