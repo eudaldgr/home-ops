@@ -21,10 +21,16 @@ kind: Kustomization
 metadata:
   name: grafana-instance
 spec:
+  components:
+    - ../../../../components/oidc
   dependsOn:
     - name: grafana-operator
   interval: 1h
   path: ./kubernetes/apps/o11y/grafana-operator/instance
+  postBuild:
+    substitute:
+      APP: grafana
+      SSO_CALLBACK: /login/generic_oauth
   prune: true
   sourceRef:
     kind: GitRepository

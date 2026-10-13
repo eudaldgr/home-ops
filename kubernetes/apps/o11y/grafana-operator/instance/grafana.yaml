@@ -15,8 +15,27 @@ spec:
       reporting_enabled: "false"
     auth:
       disable_login_form: "false"
-    auth.anonymous:
+      signout_redirect_url: https://auth.eudald.gr/api/oidc/end-session
+    auth.generic_oauth:
       enabled: "true"
+      name: Pocket ID
+      icon: signin
+      allow_sign_up: "true"
+      auto_login: "false"
+      scopes: openid email profile groups
+      auth_url: https://auth.eudald.gr/authorize
+      token_url: https://auth.eudald.gr/api/oidc/token
+      api_url: https://auth.eudald.gr/api/oidc/userinfo
+      use_pkce: "true"
+      use_refresh_token: "true"
+      login_attribute_path: preferred_username
+      name_attribute_path: name
+      email_attribute_path: email
+      groups_attribute_path: groups
+      role_attribute_path: contains(groups[*], 'admins') && 'GrafanaAdmin' || 'Viewer'
+      allow_assign_grafana_admin: "true"
+    auth.anonymous:
+      enabled: "false"
     log:
       mode: console
     metrics:
@@ -29,6 +48,7 @@ spec:
       angular_support_enabled: "true"
     server:
       enable_gzip: "true"
+      root_url: https://grafana.eudald.gr
   deployment:
     spec:
       strategy:
@@ -43,6 +63,16 @@ spec:
                     secretKeyRef:
                       name: grafana-admin-password-secret
                       key: GF_SECURITY_ADMIN_PASSWORD
+                - name: GF_AUTH_GENERIC_OAUTH_CLIENT_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-oidc
+                      key: client-id
+                - name: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-oidc
+                      key: client-secret
               securityContext:
                 allowPrivilegeEscalation: false
                 readOnlyRootFilesystem: true
@@ -62,7 +92,7 @@ spec:
       hostnames:
         - grafana.eudald.gr
       parentRefs:
-        - name: envoy-internal
+        - name: envoy-external
           namespace: network
   persistentVolumeClaim:
     spec:

@@ -35,6 +35,8 @@ spec:
       namespace: downloads
     - name: torrent
       namespace: downloads
+    - name: grafana
+      namespace: o11y
 ---
 apiVersion: pocketid.internal/v1alpha1
 kind: PocketIDUserGroup
