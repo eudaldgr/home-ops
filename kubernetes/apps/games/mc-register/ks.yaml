@@ -9,6 +9,13 @@ spec:
     - ../../../../components/sso
   interval: 1h
   path: ./kubernetes/apps/games/mc-register/app
+  patches:
+    - patch: |-
+        - op: add
+          path: /spec/logo/darkLogoUrl
+          value: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/webp/minecraft.webp
+      target:
+        kind: PocketIDOIDCClient
   postBuild:
     substitute:
       APP: mc-register
