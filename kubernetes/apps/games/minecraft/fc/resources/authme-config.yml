@@ -1,0 +1,9 @@
+settings:
+  enablePremium: true
+  sessions:
+    enabled: true
+    timeout: 720
+  registration:
+    enabled: false
+  restrictions:
+    kickNonRegistered: true

@@ -10,5 +10,6 @@ components:
 resources:
   - ./namespace.yaml
   - ./bedrockconnect/ks.yaml
+  - ./mc-register/ks.yaml
   - ./mc-router/ks.yaml
   - ./minecraft/ks.yaml

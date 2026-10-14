@@ -5,10 +5,12 @@ kind: Kustomization
 resources:
   - ./dnsendpoint.yaml
   - ./helmrelease.yaml
+  - ./infisicalstaticsecret.yaml
   - ./ocirepository.yaml
 configMapGenerator:
   - name: minecraft-fc-configmap
     files:
+      - authme-config.yml=./resources/authme-config.yml
       - geyser-config.yml=./resources/geyser-config.yml
       - luckperms-config.yml=./resources/luckperms-config.yml
       - luckperms-group-admin.yml=./resources/luckperms-group-admin.yml

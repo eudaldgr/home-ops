@@ -33,11 +33,10 @@ spec:
               MOTD: Survival • Java & Bedrock
               MODE: survival
               DIFFICULTY: normal
-              ONLINE_MODE: true
-              OPS: eudaldgr
-              # Bedrock (Floodgate) players: add them in-game with `fwhitelist add <gamertag>`
-              WHITELIST: eudaldgr
-              ENFORCE_WHITELIST: true
+              ONLINE_MODE: false
+              OPS: 40c7bf28-61ce-3b6c-a03d-7a0571f708c9
+              ENABLE_WHITELIST: false
+              ENFORCE_WHITELIST: false
               ENFORCE_SECURE_PROFILE: false
               MAX_PLAYERS: 10
               PVP: true
@@ -46,6 +45,11 @@ spec:
               SIMULATION_DISTANCE: 10
               PLAYER_IDLE_TIMEOUT: 30
               ENABLE_STATUS: true
+              RCON_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: minecraft-fc-secret
+                    key: RCON_PASSWORD
               # Plugin/Paper configs from git (/plugins, /config) always win over the copies in /data
               SYNC_SKIP_NEWER_IN_DESTINATION: false
               PLUGINS: |-
@@ -55,11 +59,13 @@ spec:
                 https://ci.ender.zone/job/EssentialsX/1832/artifact/jars/EssentialsXChat-2.22.1-dev+27-e70bdb8.jar
                 https://ci.ender.zone/job/EssentialsX/1832/artifact/jars/EssentialsXSpawn-2.22.1-dev+27-e70bdb8.jar
                 https://github.com/MilkBowl/Vault/releases/download/1.7.3/Vault.jar
+                https://github.com/AuthMe/AuthMeReloaded/releases/download/6.0.1/AuthMe-6.0.1-Paper.jar
               MODRINTH_PROJECTS: |-
                 fastasyncworldedit
                 luckperms
                 multiverse-core
                 multiverse-signportals
+                packetevents
             probes:
               liveness:
                 enabled: true
@@ -109,6 +115,10 @@ spec:
         ports:
           minecraft:
             port: *javaPort
+      rcon:
+        ports:
+          rcon:
+            port: 25575
       bedrock:
         type: LoadBalancer
         annotations:
@@ -129,6 +139,9 @@ spec:
         type: configMap
         name: minecraft-fc-configmap
         globalMounts:
+          - path: /plugins/AuthMe/config.yml
+            subPath: authme-config.yml
+            readOnly: true
           - path: /plugins/Geyser-Spigot/config.yml
             subPath: geyser-config.yml
             readOnly: true
