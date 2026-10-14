@@ -6,6 +6,7 @@ metadata:
   name: mc-register
 spec:
   components:
+    - ../../../../components/kopiur/backup
     - ../../../../components/sso
   interval: 1h
   path: ./kubernetes/apps/games/mc-register/app
@@ -14,11 +15,15 @@ spec:
         - op: add
           path: /spec/logo/darkLogoUrl
           value: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/webp/minecraft.webp
+        - op: replace
+          path: /spec/launchUrl
+          value: https://mc-register.eudald.gr/admin
       target:
         kind: PocketIDOIDCClient
   postBuild:
     substitute:
       APP: mc-register
+      KOPIUR_CAPACITY: 1Gi
       SSO_LOGO: minecraft
   prune: true
   sourceRef:

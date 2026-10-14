@@ -1,5 +1,6 @@
 settings:
   enablePremium: true
+  perPlayerLocale: false
   sessions:
     enabled: true
     timeout: 720

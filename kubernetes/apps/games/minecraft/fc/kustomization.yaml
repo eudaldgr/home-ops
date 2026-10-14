@@ -11,6 +11,7 @@ configMapGenerator:
   - name: minecraft-fc-configmap
     files:
       - authme-config.yml=./resources/authme-config.yml
+      - authme-messages-en.yml=./resources/authme-messages-en.yml
       - geyser-config.yml=./resources/geyser-config.yml
       - luckperms-config.yml=./resources/luckperms-config.yml
       - luckperms-group-admin.yml=./resources/luckperms-group-admin.yml

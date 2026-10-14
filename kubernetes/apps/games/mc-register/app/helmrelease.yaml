@@ -25,8 +25,9 @@ spec:
               PYTHONUNBUFFERED: "1"
               PORT: &port 8080
               APP_ORIGIN: https://{{ .Release.Name }}.eudald.gr
+              DATA_FILE: /data/requests.json
               SERVERS: |-
-                fc=minecraft-fc-rcon.games.svc.cluster.local:25575
+                fc=minecraft-fc-rcon.games.svc.cluster.local:25575 fc.mc.eudald.gr
               RCON_PASSWORD_FC:
                 valueFrom:
                   secretKeyRef:
@@ -57,6 +58,8 @@ spec:
         runAsNonRoot: true
         runAsUser: 65532
         runAsGroup: 65532
+        fsGroup: 65532
+        fsGroupChangePolicy: OnRootMismatch
         seccompProfile:
           type: RuntimeDefault
     service:
@@ -66,12 +69,40 @@ spec:
             port: *port
     route:
       app:
+        forceRename: "{{ .Release.Name }}"
         hostnames:
-          - "{{ .Release.Name }}.eudald.gr"
-        parentRefs:
+          - &host "{{ .Release.Name }}.eudald.gr"
+        parentRefs: &parentRefs
           - name: envoy-external
             namespace: network
+        rules:
+          - matches:
+              - path:
+                  type: PathPrefix
+                  value: /admin
+              - path:
+                  type: PathPrefix
+                  value: /oauth2
+            backendRefs:
+              - identifier: app
+                port: *port
+      public:
+        hostnames:
+          - *host
+        parentRefs: *parentRefs
+        rules:
+          - matches:
+              - path:
+                  type: PathPrefix
+                  value: /
+            backendRefs:
+              - identifier: app
+                port: *port
     persistence:
+      data:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /data
       app:
         type: configMap
         name: mc-register-configmap

@@ -34,7 +34,8 @@ spec:
               MODE: survival
               DIFFICULTY: normal
               ONLINE_MODE: false
-              OPS: 40c7bf28-61ce-3b6c-a03d-7a0571f708c9
+              OPS: eudaldgr:offline
+              EXISTING_OPS_FILE: SYNCHRONIZE
               ENABLE_WHITELIST: false
               ENFORCE_WHITELIST: false
               ENFORCE_SECURE_PROFILE: false
@@ -141,6 +142,9 @@ spec:
         globalMounts:
           - path: /plugins/AuthMe/config.yml
             subPath: authme-config.yml
+            readOnly: true
+          - path: /plugins/AuthMe/messages/messages_en.yml
+            subPath: authme-messages-en.yml
             readOnly: true
           - path: /plugins/Geyser-Spigot/config.yml
             subPath: geyser-config.yml
