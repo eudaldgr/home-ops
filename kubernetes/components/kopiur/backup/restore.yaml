@@ -5,6 +5,11 @@ kind: Restore
 metadata:
   name: ${APP}
 spec:
+  # Same identity as the SnapshotPolicy mover: a non-root restore writes files as the mover UID
+  mover:
+    securityContext:
+      runAsUser: ${KOPIUR_PUID:=65532}
+      runAsGroup: ${KOPIUR_PGID:=65532}
   policy:
     onMissingSnapshot: Continue
   source:
