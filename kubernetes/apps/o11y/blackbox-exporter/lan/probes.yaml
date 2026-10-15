@@ -12,9 +12,9 @@ spec:
     staticConfig:
       static:
         - ds920plus.lan.eudald.gr
-        - ctrl-01.lan.eudald.gr
-        - ctrl-02.lan.eudald.gr
-        - ctrl-03.lan.eudald.gr
+        - k8s-0.lan.eudald.gr
+        - k8s-1.lan.eudald.gr
+        - k8s-2.lan.eudald.gr
   metricRelabelings:
     - targetLabel: service
       replacement: blackbox-exporter-lan

@@ -16,12 +16,7 @@ cluster:
     endpoint: https://k8s.eudald.gr:6443
   token: "${TALOS_CLUSTER_TOKEN}"
 ---
-apiVersion: v1alpha1
-kind: LinkAliasConfig
-name: net0
-selector:
-  match: link.driver == "virtio_net" && mac(link.permanent_addr).startsWith("bc:24:11:00:00:")
----
+# net0 is aliased per node (nodes/<role>/<node>.yaml.j2) by MAC; VLAN 90 is the port's native (PVID) VLAN
 apiVersion: v1alpha1
 kind: LinkConfig
 name: net0
@@ -71,8 +66,23 @@ installer:
   image: factory.talos.dev/metal-installer/{{ schematic }}:v1.14.2
 provisioning:
   diskSelector:
-    match: disk.model == "QEMU HARDDISK"
-  wipe: false
+    match: disk.transport == "nvme"
+  wipe: true
+---
+apiVersion: v1alpha1
+kind: VolumeConfig
+name: EPHEMERAL
+provisioning:
+  maxSize: 100GiB
+---
+apiVersion: v1alpha1
+kind: RawVolumeConfig
+name: miroir-slow
+provisioning:
+  diskSelector:
+    match: system_disk
+  grow: true
+  minSize: 1GiB
 ---
 apiVersion: v1alpha1
 kind: FilesystemTrimConfig

@@ -39,14 +39,14 @@ _GitOps-managed home infrastructure powered by Talos, Kubernetes, OpenTofu, Flux
 
 ## Overview
 
-This repository is the source of truth for my homelab: virtual machines, Talos
+This repository is the source of truth for my homelab: bare-metal Talos nodes,
 bootstrap, Kubernetes platform controllers, applications, secrets, backups, DNS,
 and selected services that still run outside the cluster.
 
 The operating model is deliberately boring:
 
-1. OpenTofu creates and bootstraps the infrastructure.
-1. Talos runs Kubernetes on Proxmox VMs.
+1. Talos runs Kubernetes directly on bare metal, configured from `talos/`.
+1. A one-shot helmfile bootstrap (`bootstrap/`) installs the minimum Flux needs.
 1. Flux CD reconciles the desired state from `kubernetes/`.
 1. Controllers handle networking, storage, certificates, databases, policy, and backups.
 
@@ -54,17 +54,19 @@ The operating model is deliberately boring:
 
 ## Kubernetes
 
-The active cluster is a six-node Talos Kubernetes deployment on Proxmox VE.
+The active cluster is a three-node, control-plane-only Talos Kubernetes
+deployment on bare metal.
 
-| Role          | Nodes                           |
-| ------------- | ------------------------------- |
-| Control plane | `ctrl-01`, `ctrl-02`, `ctrl-03` |
+| Node    | Hardware                 | CPU       | RAM  | System / Miroir | Ceph OSD | NIC                 |
+| ------- | ------------------------ | --------- | ---- | --------------- | -------- | ------------------- |
+| `k8s-0` | Dell OptiPlex 3080 Micro | i5-10500T | 64GB | NVMe            | SATA SSD | RTL8125B 2.5GbE     |
+| `k8s-1` | HP ProDesk 400 G5 Mini   | i5-9500T  | 32GB | NVMe            | SATA SSD | Intel I226-V 2.5GbE |
+| `k8s-2` | Dell OptiPlex 3050 Micro | i5-7500T  | 24GB | NVMe            | SATA SSD | RTL8125B 2.5GbE     |
 
-The Kubernetes API is exposed at `https://10.1.20.50:6443`. Local read-only
-inspection uses the generated kubeconfig:
+The Kubernetes API is exposed at `https://k8s.eudald.gr:6443`. `mise` exports
+`KUBECONFIG` and `TALOSCONFIG` pointing at the repository root:
 
 ```bash
-export KUBECONFIG=./tofu/home.arpa/fgs/pve/output/kubeconfig
 kubectl get nodes -o wide
 flux get kustomizations -A
 ```
@@ -80,7 +82,7 @@ is a monitoring signal, not a count of pods or public services.
 | Networking               | Cilium, Gateway API, LB IPAM, BGP, L2 announcement, ExternalDNS with AdGuard webhook |
 | Ingress and tunnels      | HTTPRoute, TLS passthrough, Pocket ID, Newt/Pangolin                                 |
 | Secrets                  | Infisical and SOPS for local encrypted files                                         |
-| Storage                  | Proxmox CSI on Ceph SSD and local ZFS, NFS for selected shared data                  |
+| Storage                  | Rook Ceph on SATA SSDs, Miroir (DRBD) on NVMe, NFS for selected shared data          |
 | Databases                | CloudNativePG with barman-cloud ObjectStore backups                                  |
 | Backups                  | Kopiur volume snapshots and CloudNativePG object-store backups                       |
 | Observability and policy | kube-prometheus-stack, Hubble, Falco, Gatekeeper, Kyverno                            |
@@ -113,13 +115,19 @@ flowchart TD
 
 ## Infrastructure
 
-The Proxmox Kubernetes path is split into three OpenTofu stages.
+The cluster is built in three steps, all driven by `just`:
 
-| Stage      | Path                                    | Responsibility                                                                  |
-| ---------- | --------------------------------------- | ------------------------------------------------------------------------------- |
-| Cluster    | `tofu/home.arpa/fgs/pve/stack.cluster/` | Proxmox resources, VM definitions, DNS, storage, ACLs                           |
-| Talos      | `tofu/home.arpa/fgs/pve/stack.talos/`   | Talos machine config, Kubernetes bootstrap, Cilium bootstrap, kubeconfig output |
-| Kubernetes | `tofu/home.arpa/fgs/pve/stack.k8s/`     | Kubernetes bootstrap resources                                                  |
+| Step      | Path          | Responsibility                                                                                         |
+| --------- | ------------- | ------------------------------------------------------------------------------------------------------ |
+| Talos     | `talos/`      | Machine config rendered per node, secrets resolved from Infisical                                      |
+| Bootstrap | `bootstrap/`  | Talos apply + etcd bootstrap, CRDs, Cilium, CoreDNS, Spegel, cert-manager, Infisical operator and Flux |
+| GitOps    | `kubernetes/` | Everything else, reconciled by Flux                                                                    |
+
+```bash
+just talos download-image v1.14.2   # metal ISO for the shared schematic
+just talos apply-node k8s-0         # render and apply a node config
+just bootstrap cluster              # bootstrap Talos, Kubernetes and Flux end to end
+```
 
 Additional infrastructure lives in:
 
@@ -152,8 +160,6 @@ Additional infrastructure lives in:
 Useful read-only checks:
 
 ```bash
-export KUBECONFIG=./tofu/home.arpa/fgs/pve/output/kubeconfig
-
 flux get kustomizations -A
 kubectl get gateway,httproute -A -o wide
 kubectl get storageclass,pvc -A
@@ -161,12 +167,10 @@ kubectl get clusters.postgresql.cnpg.io -A -o wide
 kubectl get snapshotschedules.kopiur.home-operations.com -A
 ```
 
-OpenTofu validation is run per stack:
+Talos configs are validated before applying them:
 
 ```bash
-tofu -chdir=tofu/home.arpa/fgs/pve/stack.cluster validate
-tofu -chdir=tofu/home.arpa/fgs/pve/stack.talos validate
-tofu -chdir=tofu/home.arpa/fgs/pve/stack.k8s validate
+just talos render-config k8s-0 | talosctl validate --strict --mode metal --config /dev/stdin
 ```
 
 ---

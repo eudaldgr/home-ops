@@ -71,6 +71,15 @@ spec:
         serviceMonitorSelectorNilUsesHelmValues: false
         retention: 30d
         retentionSize: 40GiB
+        # Keep the TSDB (miroir-slow-local) off k8s-0: its NVMe is past its rated endurance
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: kubernetes.io/hostname
+                      operator: NotIn
+                      values: ["k8s-0"]
         resources:
           requests:
             cpu: 100m

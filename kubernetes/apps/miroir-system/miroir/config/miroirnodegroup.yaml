@@ -11,5 +11,5 @@ spec:
   template:
     pools:
       - name: slow
-        loopfile:
-          baseDir: /var/lib/miroir
+        lvmthin:
+          device: /dev/disk/by-partlabel/r-miroir-slow
