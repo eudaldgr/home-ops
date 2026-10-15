@@ -11,7 +11,7 @@ machine:
 cluster:
   ca:
     crt: "${TALOS_CLUSTER_CA_CRT}"
-  clusterName: homelab
+  clusterName: main
   controlPlane:
     endpoint: https://k8s.eudald.gr:6443
   token: "${TALOS_CLUSTER_TOKEN}"
@@ -67,7 +67,7 @@ installer:
 provisioning:
   diskSelector:
     match: disk.transport == "nvme"
-  wipe: true
+  wipe: false
 ---
 apiVersion: v1alpha1
 kind: VolumeConfig
@@ -137,6 +137,15 @@ params:
   net/ipv6/conf/net0.50/disable_ipv6: "1" # keep the host off IPv6 on the IoT segment
   net/ipv6/conf/net0.60/disable_ipv6: "1" # keep the host off IPv6 on the IoT segment
   user.max_user_namespaces: "11255"
+---
+apiVersion: v1alpha1
+kind: EtcFileConfig
+name: nfs.conf
+mode: 0o644
+contents: |
+  [nfsrahead]
+  nfs4=16384
+  default=128
 ---
 apiVersion: v1alpha1
 kind: EtcFileConfig
