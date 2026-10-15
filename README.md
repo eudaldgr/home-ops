@@ -64,28 +64,27 @@ deployment on bare metal.
 | `k8s-2` | Dell OptiPlex 3050 Micro | i5-7500T  | 24GB | NVMe            | SATA SSD | RTL8125B 2.5GbE     |
 
 The Kubernetes API is exposed at `https://k8s.eudald.gr:6443`. `mise` exports
-`KUBECONFIG` and `TALOSCONFIG` pointing at the repository root:
+`KUBECONFIG` and `TALOSCONFIG` pointing at the `kubeconfig` and `talosconfig`
+files in the repository root:
 
 ```bash
 kubectl get nodes -o wide
 flux get kustomizations -A
 ```
 
-The `Targets` badge counts Prometheus scrape targets that are currently up. It
-is a monitoring signal, not a count of pods or public services.
-
 ### Core Components
 
-| Area                     | Components                                                                           |
-| ------------------------ | ------------------------------------------------------------------------------------ |
-| GitOps                   | Flux CD, Kustomize, Helm Controller                                                  |
-| Networking               | Cilium, Gateway API, LB IPAM, BGP, L2 announcement, ExternalDNS with AdGuard webhook |
-| Ingress and tunnels      | HTTPRoute, TLS passthrough, Pocket ID, Newt/Pangolin                                 |
-| Secrets                  | Infisical and SOPS for local encrypted files                                         |
-| Storage                  | Rook Ceph on SATA SSDs, Miroir (DRBD) on NVMe, NFS for selected shared data          |
-| Databases                | CloudNativePG with barman-cloud ObjectStore backups                                  |
-| Backups                  | Kopiur volume snapshots and CloudNativePG object-store backups                       |
-| Observability and policy | kube-prometheus-stack, Hubble, Falco, Gatekeeper, Kyverno                            |
+| Area             | Components                                                                    |
+| ---------------- | ----------------------------------------------------------------------------- |
+| GitOps           | Flux Operator, Flux CD, Kustomize, Helm Controller                            |
+| Networking       | Cilium (kube-proxy replacement, LB IPAM, BGP), Multus, Spegel                 |
+| Ingress and DNS  | Envoy Gateway (Gateway API), ExternalDNS for OPNsense and Cloudflare, towonel |
+| Auth and secrets | Pocket ID (OIDC/SSO), Infisical operator, cert-manager                        |
+| Storage          | Rook Ceph on SATA SSDs, Miroir (DRBD) on NVMe, NFS from the ds920plus         |
+| Databases        | CloudNativePG operator, Dragonfly operator                                    |
+| Backups          | Kopiur volume snapshots                                                       |
+| Observability    | kube-prometheus-stack, Grafana operator, VictoriaLogs, Gatus, Kromgo          |
+| Upgrades         | tuppr (Talos and Kubernetes upgrades), Renovate                               |
 
 ---
 
@@ -131,10 +130,11 @@ just bootstrap cluster              # bootstrap Talos, Kubernetes and Flux end t
 
 Additional infrastructure lives in:
 
-- `tofu/backblaze/homelab/` for backup buckets.
-- `tofu/hetzner/homelab/` for Hetzner resources.
-- `ansible/` for host preparation.
-- `compose/ds920plus/prod/` for Compose workloads managed around Komodo and Pangolin.
+- `tofu/backblaze/` for backup buckets.
+- `tofu/hetzner/cadi/` for the `cadi` Hetzner VPS.
+- `ansible/cadi/` for bootstrapping `cadi`: Docker, SSH hardening, UFW, country blocks and doco-cd.
+- `compose/cadi/` for the edge stack on `cadi` (CrowdSec, towonel, Caddy, Gatus), deployed with doco-cd.
+- `compose/ds920plus/` for NAS workloads (Garage, Zot, exporters, towonel agent), deployed with doco-cd.
 
 ---
 
@@ -142,15 +142,13 @@ Additional infrastructure lives in:
 
 ```text
 .
-├── ansible/      # Host preparation for container hosts, Komodo, and Pangolin
-├── compose/      # Compose stacks for ds920plus, split into prod and archive
+├── ansible/      # Host preparation for the cadi VPS
+├── bootstrap/    # Helmfile and Kustomize used once to bootstrap the cluster
+├── compose/      # Compose stacks for cadi and ds920plus
 ├── coreboot/     # Coreboot firmware work
-├── komodo/       # Komodo resources: servers, repos, syncs, actions, builders
 ├── kubernetes/   # Kubernetes desired state reconciled by Flux CD
-├── packer/       # Packer templates and variables
-├── scripts/      # Local operator helpers
-├── secrets/      # Sensitive material
-└── tofu/         # OpenTofu stacks and modules
+├── talos/        # Talos schematic, machine config templates and node patches
+└── tofu/         # OpenTofu stacks for Backblaze and Hetzner
 ```
 
 ---
@@ -163,8 +161,8 @@ Useful read-only checks:
 flux get kustomizations -A
 kubectl get gateway,httproute -A -o wide
 kubectl get storageclass,pvc -A
-kubectl get clusters.postgresql.cnpg.io -A -o wide
 kubectl get snapshotschedules.kopiur.home-operations.com -A
+talosctl health
 ```
 
 Talos configs are validated before applying them:
@@ -180,9 +178,8 @@ just talos render-config k8s-0 | talosctl validate --strict --mode metal --confi
 This repository controls real infrastructure.
 
 - Prefer GitOps over manual cluster mutation.
-- Treat `./deploy` as unsafe notes, not as a normal deployment command.
 - Do not commit plaintext secrets, kubeconfigs, private keys, tfstate, or local environment files.
-- Do not modify encrypted secret material unless that is the explicit task.
+- Keep secrets in Infisical and reference them; never inline them in manifests or templates.
 
 ---
 
@@ -190,5 +187,5 @@ This repository controls real infrastructure.
 
 The layout is inspired by the home-operations community, especially repositories
 that keep infrastructure understandable by making the current state visible at a
-glance. The implementation here is tailored to this cluster's actual Proxmox,
-Talos, Cilium, Proxmox CSI, Flux CD, Kopiur, and Compose setup.
+glance. The implementation here is tailored to this cluster's actual Talos,
+Cilium, Rook Ceph, Miroir, Flux CD, Kopiur, and Compose setup.
