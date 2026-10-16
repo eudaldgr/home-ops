@@ -1,6 +1,0 @@
----
-namespace:
-  - group: secrets.infisical.com
-    kind: InfisicalStaticSecret
-    path: spec/targets[]/namespace
-    create: true
