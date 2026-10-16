@@ -2,19 +2,19 @@
 version: v1alpha1
 machine:
   ca:
-    crt: "${TALOS_MACHINE_CA_CRT}"
+    crt: op://kubernetes/talos/MACHINE_CA_CRT
   features:
     apidCheckExtKeyUsage: true
     diskQuotaSupport: true
     rbac: true
-  token: "${TALOS_MACHINE_TOKEN}"
+  token: op://kubernetes/talos/MACHINE_TOKEN
 cluster:
   ca:
-    crt: "${TALOS_CLUSTER_CA_CRT}"
+    crt: op://kubernetes/talos/CLUSTER_CA_CRT
   clusterName: main
   controlPlane:
     endpoint: https://k8s.eudald.gr:6443
-  token: "${TALOS_CLUSTER_TOKEN}"
+  token: op://kubernetes/talos/CLUSTER_TOKEN
 ---
 # net0 is aliased per node (nodes/<role>/<node>.yaml.j2) by MAC; VLAN 90 is the port's native (PVID) VLAN
 apiVersion: v1alpha1
@@ -57,8 +57,8 @@ endpoint: https://discovery.talos.dev/
 ---
 apiVersion: v1alpha1
 kind: DiscoveryIdentityConfig
-clusterID: "${TALOS_CLUSTER_ID}"
-clusterSecret: "${TALOS_CLUSTER_SECRET}"
+clusterID: op://kubernetes/talos/CLUSTER_ID
+clusterSecret: op://kubernetes/talos/CLUSTER_SECRET
 ---
 apiVersion: v1alpha1
 kind: UnattendedInstallConfig
