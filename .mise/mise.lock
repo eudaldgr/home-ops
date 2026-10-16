@@ -60,24 +60,24 @@ url = "https://github.com/home-operations/flate/releases/download/v0.6.5/flate_0
 url_api = "https://api.github.com/repos/home-operations/flate/releases/assets/541337298"
 
 [[tools."github:mitsuhiko/minijinja"]]
-version = "2.24.0"
+version = "3.0.1"
 backend = "github:mitsuhiko/minijinja"
-specifiers = ["2.24.0"]
+specifiers = ["3.0.1"]
 
 [tools."github:mitsuhiko/minijinja"."platforms.linux-arm64"]
-checksum = "sha256:b60f741e4101c0701a22a1115b2295fd8e4ae13cdffc0ebf4d1821d876e93347"
-url = "https://github.com/mitsuhiko/minijinja/releases/download/2.24.0/minijinja-cli-aarch64-unknown-linux-gnu.tar.xz"
-url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/511868827"
+checksum = "sha256:445bf828667b1ab083cc61383c71897c6c62435bdff797c30d0ca1d4c63f1e25"
+url = "https://github.com/mitsuhiko/minijinja/releases/download/3.0.1/minijinja-cli-aarch64-unknown-linux-gnu.tar.xz"
+url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/644229133"
 
 [tools."github:mitsuhiko/minijinja"."platforms.linux-x64"]
-checksum = "sha256:04651ea786eee8e6d5311caf96e01874d984ff72f3d3d91c2195851f0b414580"
-url = "https://github.com/mitsuhiko/minijinja/releases/download/2.24.0/minijinja-cli-x86_64-unknown-linux-gnu.tar.xz"
-url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/511868860"
+checksum = "sha256:5b2eb07b18d5804e50b4e83ebdaae9b70dda37f4a2d058987881396e6c91c8b6"
+url = "https://github.com/mitsuhiko/minijinja/releases/download/3.0.1/minijinja-cli-x86_64-unknown-linux-gnu.tar.xz"
+url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/644229276"
 
 [tools."github:mitsuhiko/minijinja"."platforms.macos-arm64"]
-checksum = "sha256:a0f1525bcac485a80313cec7e835ed03335bd55bc14dc5cf070c7eb9789d9905"
-url = "https://github.com/mitsuhiko/minijinja/releases/download/2.24.0/minijinja-cli-aarch64-apple-darwin.tar.xz"
-url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/511868818"
+checksum = "sha256:a171668f90ff02f6b9234437eb96b1588357e3fd522135cd79c36681282c1f4c"
+url = "https://github.com/mitsuhiko/minijinja/releases/download/3.0.1/minijinja-cli-aarch64-apple-darwin.tar.xz"
+url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/644229103"
 
 [[tools.gum]]
 version = "2.0.2"
@@ -140,27 +140,27 @@ url = "https://github.com/helmfile/helmfile/releases/download/v1.8.1/helmfile_1.
 url_api = "https://api.github.com/repos/helmfile/helmfile/releases/assets/599703536"
 
 [[tools.infisical]]
-version = "0.43.138"
+version = "0.44.2"
 backend = "github:Infisical/cli"
-specifiers = ["v0.43.138"]
+specifiers = ["v0.44.2"]
 
 [tools.infisical.options]
 asset_pattern = "cli_{{ version }}_{{ os(macos='darwin') }}_{{ arch(x64='amd64') }}.tar.gz"
 
 [tools.infisical."platforms.linux-arm64"]
-checksum = "sha256:90a0f131ca11d64311b3994f3ff776622acd5b3bec931861d4425f2dc7316dcb"
-url = "https://github.com/Infisical/cli/releases/download/v0.43.138/cli_0.43.138_linux_arm64.tar.gz"
-url_api = "https://api.github.com/repos/Infisical/cli/releases/assets/599703932"
+checksum = "sha256:baa7c8ef388a9f84a720e75fe972fb2f804f954c4e2b01a77c92e98a86cb26f5"
+url = "https://github.com/Infisical/cli/releases/download/v0.44.2/cli_0.44.2_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/Infisical/cli/releases/assets/648580029"
 
 [tools.infisical."platforms.linux-x64"]
-checksum = "sha256:45a98380964650e4cc2b57ff5361d174afb55b3daf7c2465640d3a7bb7550f92"
-url = "https://github.com/Infisical/cli/releases/download/v0.43.138/cli_0.43.138_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/Infisical/cli/releases/assets/599703931"
+checksum = "sha256:6e8a3b9c4f17e2a95d5934f9bc87b7935927c4cd43dd5f9ba984a89f898022ca"
+url = "https://github.com/Infisical/cli/releases/download/v0.44.2/cli_0.44.2_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/Infisical/cli/releases/assets/648580157"
 
 [tools.infisical."platforms.macos-arm64"]
-checksum = "sha256:fc1813e7909bd35b118d4079b45a2c470818508dc0f5a1211df1e8f035589765"
-url = "https://github.com/Infisical/cli/releases/download/v0.43.138/cli_0.43.138_darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/Infisical/cli/releases/assets/599690092"
+checksum = "sha256:a86da497f8f620ad61f921c420c4570f49578d4c3b5d897db2fd9d0fdc68c34c"
+url = "https://github.com/Infisical/cli/releases/download/v0.44.2/cli_0.44.2_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/Infisical/cli/releases/assets/648564069"
 
 [[tools.jq]]
 version = "1.8.2"
@@ -266,10 +266,10 @@ checksum = "sha256:751fdf7439f115d87ee2a8f3f18c065b6151852068e3e666ac60ac2996f75
 url = "https://nodejs.org/dist/v26.10.0/node-v26.10.0-darwin-arm64.tar.gz"
 
 [[tools.oxfmt]]
-version = "0.71.0"
-aube = { path = "locks/oxfmt/0.71.0", digest = "sha256:2b7bfb8c20b448ab9b5549e2e0a43049a897d50d995103408bbba2b0add2bcf0" }
+version = "0.73.0"
+aube = { path = "locks/oxfmt/0.73.0", digest = "sha256:e42eeebedd060ec6393c40caa35362b541991453b9aab2de3d33d41a0c245a62" }
 backend = "npm:oxfmt"
-specifiers = ["0.71.0"]
+specifiers = ["0.73.0"]
 
 [[tools.shellcheck]]
 version = "0.11.0"
