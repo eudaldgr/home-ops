@@ -2,7 +2,7 @@
 name: towonel-agent
 services:
   app:
-    image: codeberg.org/towonel/towonel-agent:1.11.1@sha256:003cc4f2a395e124019e7d1cbba357381a2329630526a4eb4bd3075f3774e250
+    image: codeberg.org/towonel/towonel-agent:1.13.2@sha256:97434ddb9612983a7efb52a965c14298141da705bc42f12585e0547aa28b7ea6
     container_name: towonel_agent_1
     environment:
       RUST_LOG: info
