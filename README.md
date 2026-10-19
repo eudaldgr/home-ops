@@ -18,7 +18,7 @@ _GitOps-managed home infrastructure powered by Talos, Kubernetes, OpenTofu, Flux
 [![Talos](https://kromgo.eudald.gr/badges/talos_version)](https://talos.dev)&nbsp;&nbsp;
 [![Kubernetes](https://kromgo.eudald.gr/badges/kubernetes_version)](https://kubernetes.io)&nbsp;&nbsp;
 [![Flux](https://kromgo.eudald.gr/badges/flux_version)](https://fluxcd.io)&nbsp;&nbsp;
-[![Renovate](https://img.shields.io/github/actions/workflow/status/eudaldgr/homelab/renovate.yaml?branch=main&label&logo=renovate&color=blue)](https://github.com/eudaldgr/homelab/actions/workflows/renovate.yaml)
+![Renovate](https://img.shields.io/badge/enabled-blue?logo=renovate)
 
 </div>
 
