@@ -9,7 +9,7 @@ terraform {
   }
 
   backend "s3" {
-    profile                     = "garage"
+    endpoints                   = { s3 = "http://ds920plus.lan.eudald.gr:9000" }
     bucket                      = "tofu"
     key                         = "backblaze/terraform.tfstate"
     region                      = "eu-south-0"
