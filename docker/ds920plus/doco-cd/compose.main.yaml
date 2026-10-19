@@ -1,32 +1,23 @@
 ---
 name: doco-cd
 secrets:
-  infisical_client_secret:
-    file: /opt/doco-cd/infisical_client_secret
-  api_secret:
-    file: /opt/doco-cd/api_secret
-  webhook_secret:
-    file: /opt/doco-cd/webhook_secret
+  1pw_token:
+    file: /volume2/docker/doco-cd/1pw_token
 services:
   app:
     image: ghcr.io/kimdre/doco-cd:0.129.0@sha256:79960a8eb7a294db6e5e5af47a702e83d494cc7abe9eecfaacb7c70a71eeb2cb
     container_name: doco-cd
-    env_file:
-      - /opt/doco-cd/.env
     environment:
-      API_SECRET_FILE: /run/secrets/api_secret
-      DEPLOY_CONFIG_BASE_DIR: ./compose/cadi/
+      DEPLOY_CONFIG_BASE_DIR: ./docker/ds920plus/
       HTTP_PORT: 8880
       LOG_LEVEL: info
       POLL_CONFIG: |-
         - url: https://github.com/eudaldgr/homelab.git
           reference: main
           interval: 3600
-      SECRET_PROVIDER: infisical
-      SECRET_PROVIDER_SITE_URL: https://eu.infisical.com
-      SECRET_PROVIDER_CLIENT_SECRET_FILE: /run/secrets/infisical_client_secret
+      SECRET_PROVIDER: 1password
+      SECRET_PROVIDER_ACCESS_TOKEN_FILE: /run/secrets/1pw_token
       TZ: Europe/Madrid
-      WEBHOOK_SECRET_FILE: /run/secrets/webhook_secret
     healthcheck:
       test:
         - CMD
@@ -37,16 +28,10 @@ services:
       timeout: 5s
       retries: 3
     secrets:
-      - infisical_client_secret
-      - api_secret
-      - webhook_secret
+      - 1pw_token
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - data:/data
     restart: unless-stopped
 volumes:
   data:
-networks:
-  default:
-    name: edge
-    external: true

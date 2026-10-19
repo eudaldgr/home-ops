@@ -1,20 +1,29 @@
 ---
-name: doco-cd-updater
+name: doco-cd
+secrets:
+  1pw_token:
+    file: /opt/doco-cd/1pw_token
+  api_secret:
+    file: /opt/doco-cd/api_secret
+  webhook_secret:
+    file: /opt/doco-cd/webhook_secret
 services:
   app:
     image: ghcr.io/kimdre/doco-cd:0.129.0@sha256:79960a8eb7a294db6e5e5af47a702e83d494cc7abe9eecfaacb7c70a71eeb2cb
-    container_name: doco-cd-updater
+    container_name: doco-cd
     environment:
-      DEPLOY_CONFIG_BASE_DIR: ./compose/cadi
-      HTTP_PORT: 8881
+      API_SECRET_FILE: /run/secrets/api_secret
+      DEPLOY_CONFIG_BASE_DIR: ./docker/cadi/
+      HTTP_PORT: 8880
       LOG_LEVEL: info
       POLL_CONFIG: |-
         - url: https://github.com/eudaldgr/homelab.git
           reference: main
           interval: 3600
-          target: updater
-      SCHEDULER_ENABLED: "false"
+      SECRET_PROVIDER: 1password
+      SECRET_PROVIDER_ACCESS_TOKEN_FILE: /run/secrets/1pw_token
       TZ: Europe/Madrid
+      WEBHOOK_SECRET_FILE: /run/secrets/webhook_secret
     healthcheck:
       test:
         - CMD
@@ -24,15 +33,17 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+    secrets:
+      - 1pw_token
+      - api_secret
+      - webhook_secret
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - data:/data
-      - type: bind
-        source: /opt/doco-cd
-        target: /opt/doco-cd
-        read_only: true
-        bind:
-          create_host_path: false
     restart: unless-stopped
 volumes:
   data:
+networks:
+  default:
+    name: edge
+    external: true

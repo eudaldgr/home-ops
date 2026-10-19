@@ -8,10 +8,6 @@
     ansible_python_interpreter: auto_silent
     host_ssh_port: 22222
     ansible_port: "{{ bootstrap_ssh_port | default(22) }}"
-    infisical_domain: https://eu.infisical.com
-    infisical_project: 89d5ec5c-6201-4007-acc8-3f4748228396
-    infisical_env: prod
-    infisical_vps_path: /vps/cadi
     blocked_countries:
       - IL
       - KP
@@ -26,27 +22,20 @@
       ansible.builtin.hostname:
         name: cadi
 
-    - name: Fetch bootstrap secrets from Infisical
+    - name: Fetch bootstrap secrets from 1Password
       tags:
         - always
-      ansible.builtin.shell: >
-        infisical secrets get {{ item.key }}
-        --domain {{ infisical_domain }}
-        --projectId {{ infisical_project }}
-        --env {{ infisical_env }}
-        --path {{ item.path }}
-        --plain 2>/dev/null || echo ""
+      ansible.builtin.shell: "op read 'op://{{ item.key }}' < /dev/null"
       delegate_to: localhost
       become: false
       check_mode: false
       changed_when: false
       no_log: true
       loop:
-        - { key: INFISICAL_DOCOCD_CLIENT_ID, path: "{{ infisical_vps_path }}" }
-        - { key: INFISICAL_DOCOCD_CLIENT_SECRET, path: "{{ infisical_vps_path }}" }
-        - { key: DOCOCD_API_SECRET, path: "{{ infisical_vps_path }}" }
-        - { key: DOCOCD_WEBHOOK_SECRET, path: "{{ infisical_vps_path }}" }
-        - { key: CROWDSEC_API_KEY, path: "{{ infisical_vps_path }}" }
+        - { key: docker/cadi/DOCOCD_OP_TOKEN, var: dococd_op_token }
+        - { key: docker/cadi/DOCOCD_API_SECRET, var: dococd_api_secret }
+        - { key: docker/cadi/DOCOCD_WEBHOOK_SECRET, var: dococd_webhook_secret }
+        - { key: docker/cadi/CROWDSEC_API_KEY, var: crowdsec_api_key }
       register: secrets_raw
       loop_control:
         label: "{{ item.key }}"
@@ -55,7 +44,7 @@
       tags:
         - always
       ansible.builtin.set_fact:
-        "{{ item.item.key | lower }}": "{{ item.stdout | default('', true) }}"
+        "{{ item.item.var }}": "{{ item.stdout }}"
       loop: "{{ secrets_raw.results }}"
       loop_control:
         label: "{{ item.item.key }}"
@@ -63,14 +52,11 @@
 
     - name: Validate required secrets
       ansible.builtin.fail:
-        msg: "Required secret '{{ item }}' is empty in Infisical"
-      when: lookup('vars', item | lower) == ""
-      loop:
-        - INFISICAL_DOCOCD_CLIENT_ID
-        - INFISICAL_DOCOCD_CLIENT_SECRET
-        - DOCOCD_API_SECRET
-        - DOCOCD_WEBHOOK_SECRET
-        - CROWDSEC_API_KEY
+        msg: "Required secret '{{ item.item.key }}' is empty in 1Password"
+      when: item.stdout == ""
+      loop: "{{ secrets_raw.results }}"
+      loop_control:
+        label: "{{ item.item.key }}"
       no_log: true
 
     - name: packages
@@ -206,7 +192,7 @@
 
         - name: doco-cd | Copy bootstrap compose file
           ansible.builtin.copy:
-            src: "{{ playbook_dir }}/../../compose/cadi/doco-cd/compose.main.yaml"
+            src: "{{ playbook_dir }}/../../docker/cadi/doco-cd/compose.main.yaml"
             dest: "{{ dococd_config_dir }}/compose.yaml"
             owner: root
             group: root
@@ -223,10 +209,8 @@
             mode: "0600"
           no_log: true
           loop:
-            - name: .env
-              content: "SECRET_PROVIDER_CLIENT_ID={{ infisical_dococd_client_id }}"
-            - name: infisical_client_secret
-              content: "{{ infisical_dococd_client_secret }}"
+            - name: 1pw_token
+              content: "{{ dococd_op_token }}"
             - name: api_secret
               content: "{{ dococd_api_secret }}"
             - name: webhook_secret

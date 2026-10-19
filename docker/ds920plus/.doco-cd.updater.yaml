@@ -1,6 +1,6 @@
 ---
 name: doco-cd
-working_dir: ./compose/ds920plus/doco-cd
+working_dir: ./docker/ds920plus/doco-cd
 force_recreate: true
 reconciliation:
   enabled: true

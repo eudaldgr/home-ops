@@ -1,6 +1,6 @@
 ---
 name: doco-cd
-working_dir: ./compose/cadi/doco-cd
+working_dir: ./docker/cadi/doco-cd
 force_recreate: true
 reconciliation:
   enabled: true

@@ -1,0 +1,29 @@
+---
+working_dir: ./docker/ds920plus
+auto_discovery:
+  enabled: true
+  depth: 1
+  delete: true
+force_recreate: false
+reconciliation:
+  enabled: true
+  interval: 3600
+environment:
+  APP_DATA_DIR: /volume2/docker
+  S3_DATA_DIR: /volume1/s3
+  PUID: "1027"
+  PGID: "100"
+  TZ: Europe/Madrid
+external_secrets:
+  TOWONEL_INVITE_TOKEN: op://docker/towonel-agent/TOWONEL_INVITE_TOKEN
+  GARAGE_RPC_SECRET: op://docker/garage/GARAGE_RPC_SECRET
+  GARAGE_ADMIN_TOKEN: op://docker/garage/GARAGE_ADMIN_TOKEN
+---
+name: doco-cd-updater
+working_dir: ./docker/ds920plus/doco-cd
+compose_files:
+  - compose.updater.yaml
+force_recreate: true
+reconciliation:
+  enabled: true
+  interval: 3600
