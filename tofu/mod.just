@@ -17,7 +17,7 @@ cadi-bootstrap *args:
         port=22222
     fi
     just log info "Running Ansible against Cadi" "ip" "${ip}" "port" "${port}"
-    just tofu with-secrets /vps/cadi ansible-playbook -i "${ip}," -u ubuntu -e "bootstrap_ssh_port=${port}" \
+    ansible-playbook -i "${ip}," -u ubuntu -e "bootstrap_ssh_port=${port}" \
         "{{ source_directory() }}/../ansible/cadi/playbook.yaml" {{ args }}
 
 [doc('Initialize an OpenTofu stack')]
@@ -32,17 +32,9 @@ output stack *args:
 plan stack *args:
     just tofu run "{{ stack }}" plan {{ args }}
 
-# Secrets for a stack live in Infisical under /tofu/<provider> (the first path segment of the stack)
-[arg('stack', pattern='backblaze|hetzner/cadi|internal/fgs/pve/stack\.(cluster|talos)')]
+# Provider credentials are 1Password references in <provider>/.env.op (the first path segment of the stack)
+[arg('stack', pattern='backblaze|hetzner/cadi')]
 [private]
 run stack *args:
-    just tofu with-secrets "/tofu/$(cut -d/ -f1 <<< "{{ stack }}")" tofu -chdir="{{ source_directory() }}/{{ stack }}" {{ args }}
-
-[private]
-with-secrets path *cmd:
-    exec infisical run \
-        --domain=https://eu.infisical.com \
-        --projectId=89d5ec5c-6201-4007-acc8-3f4748228396 \
-        --env=prod --expand=false --silent \
-        --path="{{ path }}" \
-        -- {{ cmd }}
+    exec op run --no-masking --env-file="{{ source_directory() }}/$(cut -d/ -f1 <<< "{{ stack }}")/.env.op" -- \
+        tofu -chdir="{{ source_directory() }}/{{ stack }}" {{ args }}

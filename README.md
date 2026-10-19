@@ -79,7 +79,7 @@ flux get kustomizations -A
 | GitOps           | Flux Operator, Flux CD, Kustomize, Helm Controller                            |
 | Networking       | Cilium (kube-proxy replacement, LB IPAM, BGP), Multus, Spegel                 |
 | Ingress and DNS  | Envoy Gateway (Gateway API), ExternalDNS for OPNsense and Cloudflare, towonel |
-| Auth and secrets | Pocket ID (OIDC/SSO), Infisical operator, cert-manager                        |
+| Auth and secrets | Pocket ID (OIDC/SSO), External Secrets + 1Password Connect, cert-manager      |
 | Storage          | Rook Ceph on SATA SSDs, Miroir (DRBD) on NVMe, NFS from the ds920plus         |
 | Databases        | CloudNativePG operator, Dragonfly operator                                    |
 | Backups          | Kopiur volume snapshots                                                       |
@@ -116,11 +116,11 @@ flowchart TD
 
 The cluster is built in three steps, all driven by `just`:
 
-| Step      | Path          | Responsibility                                                                                         |
-| --------- | ------------- | ------------------------------------------------------------------------------------------------------ |
-| Talos     | `talos/`      | Machine config rendered per node, secrets resolved from Infisical                                      |
-| Bootstrap | `bootstrap/`  | Talos apply + etcd bootstrap, CRDs, Cilium, CoreDNS, Spegel, cert-manager, Infisical operator and Flux |
-| GitOps    | `kubernetes/` | Everything else, reconciled by Flux                                                                    |
+| Step      | Path          | Responsibility                                                                                       |
+| --------- | ------------- | ---------------------------------------------------------------------------------------------------- |
+| Talos     | `talos/`      | Machine config rendered per node, secrets resolved from 1Password (`op inject`)                      |
+| Bootstrap | `bootstrap/`  | Talos apply + etcd bootstrap, CRDs, Cilium, CoreDNS, Spegel, cert-manager, External Secrets and Flux |
+| GitOps    | `kubernetes/` | Everything else, reconciled by Flux                                                                  |
 
 ```bash
 just talos download-image v1.14.2   # metal ISO for the shared schematic
@@ -133,8 +133,8 @@ Additional infrastructure lives in:
 - `tofu/backblaze/` for backup buckets.
 - `tofu/hetzner/cadi/` for the `cadi` Hetzner VPS.
 - `ansible/cadi/` for bootstrapping `cadi`: Docker, SSH hardening, UFW, country blocks and doco-cd.
-- `compose/cadi/` for the edge stack on `cadi` (CrowdSec, towonel, Caddy, Gatus), deployed with doco-cd.
-- `compose/ds920plus/` for NAS workloads (Garage, Zot, exporters, towonel agent), deployed with doco-cd.
+- `docker/cadi/` for the edge stack on `cadi` (CrowdSec, towonel, Caddy, Gatus), deployed with doco-cd.
+- `docker/ds920plus/` for NAS workloads (Garage, Zot, exporters, towonel agent), deployed with doco-cd.
 
 ---
 
@@ -144,7 +144,7 @@ Additional infrastructure lives in:
 .
 ├── ansible/      # Host preparation for the cadi VPS
 ├── bootstrap/    # Helmfile and Kustomize used once to bootstrap the cluster
-├── compose/      # Compose stacks for cadi and ds920plus
+├── docker/       # Compose stacks for cadi and ds920plus
 ├── coreboot/     # Coreboot firmware work
 ├── kubernetes/   # Kubernetes desired state reconciled by Flux CD
 ├── talos/        # Talos schematic, machine config templates and node patches
@@ -179,7 +179,7 @@ This repository controls real infrastructure.
 
 - Prefer GitOps over manual cluster mutation.
 - Do not commit plaintext secrets, kubeconfigs, private keys, tfstate, or local environment files.
-- Keep secrets in Infisical and reference them; never inline them in manifests or templates.
+- Keep secrets in 1Password and reference them (ExternalSecret, `op://`); never inline them in manifests or templates.
 
 ---
 
