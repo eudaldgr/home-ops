@@ -139,29 +139,6 @@ checksum = "sha256:0e788f4aa7b4eea1ec0d1e278e0e66e845d5733be5f4e6cb7f832c779e656
 url = "https://github.com/helmfile/helmfile/releases/download/v1.8.2/helmfile_1.8.2_darwin_arm64.tar.gz"
 url_api = "https://api.github.com/repos/helmfile/helmfile/releases/assets/647791352"
 
-[[tools.infisical]]
-version = "0.44.2"
-backend = "github:Infisical/cli"
-specifiers = ["v0.44.2"]
-
-[tools.infisical.options]
-asset_pattern = "cli_{{ version }}_{{ os(macos='darwin') }}_{{ arch(x64='amd64') }}.tar.gz"
-
-[tools.infisical."platforms.linux-arm64"]
-checksum = "sha256:baa7c8ef388a9f84a720e75fe972fb2f804f954c4e2b01a77c92e98a86cb26f5"
-url = "https://github.com/Infisical/cli/releases/download/v0.44.2/cli_0.44.2_linux_arm64.tar.gz"
-url_api = "https://api.github.com/repos/Infisical/cli/releases/assets/648580029"
-
-[tools.infisical."platforms.linux-x64"]
-checksum = "sha256:6e8a3b9c4f17e2a95d5934f9bc87b7935927c4cd43dd5f9ba984a89f898022ca"
-url = "https://github.com/Infisical/cli/releases/download/v0.44.2/cli_0.44.2_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/Infisical/cli/releases/assets/648580157"
-
-[tools.infisical."platforms.macos-arm64"]
-checksum = "sha256:a86da497f8f620ad61f921c420c4570f49578d4c3b5d897db2fd9d0fdc68c34c"
-url = "https://github.com/Infisical/cli/releases/download/v0.44.2/cli_0.44.2_darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/Infisical/cli/releases/assets/648564069"
-
 [[tools.jq]]
 version = "1.8.2"
 backend = "aqua:jqlang/jq"
