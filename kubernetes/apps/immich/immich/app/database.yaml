@@ -1,0 +1,21 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/database_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: immich
+spec:
+  cluster:
+    name: immich-postgres
+  name: immich
+  owner: immich
+  # Created by the operator as superuser, so immich itself runs without superuser
+  extensions:
+    - name: vector
+      ensure: present
+    - name: vchord
+      ensure: present
+    - name: cube
+      ensure: present
+    - name: earthdistance
+      ensure: present

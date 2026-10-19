@@ -6,24 +6,31 @@ metadata:
   name: immich
 spec:
   components:
+    - ../../../../components/cnpg/pg18
+    - ../../../../components/cnpg/pg18-vchord
     - ../../../../components/dragonfly
-    - ../../../../components/kopiur/backup
   dependsOn:
+    - name: cloudnative-pg-barman-plugin
+      namespace: database
     - name: dragonfly-operator
       namespace: database
+  healthCheckExprs:
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
+      failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')
+      current: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')
   interval: 1h
-  path: ./kubernetes/apps/default/immich/app
+  path: ./kubernetes/apps/immich/immich/app
   postBuild:
     substitute:
       APP: immich
+      CNPG_CAPACITY: 10Gi
+      CNPG_INSTANCES: "2"
       DRAGONFLY_LUA_FLAGS: allow-undeclared-keys
-      KOPIUR_CAPACITY: 10Gi
-      KOPIUR_PUID: "999"
-      KOPIUR_PGID: "999"
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: default
+  targetNamespace: immich
   wait: false
