@@ -2,10 +2,14 @@
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: [
     "github>home-operations/renovate-presets#8.1.0",
+    "github>home-operations/renovate-presets//apps/cnpg.json5#8.1.0",
     "github>home-operations/renovate-presets//apps/grafanaDashboards.json5#8.1.0",
     "github>home-operations/renovate-presets//apps/talosFactory.json5#8.1.0",
     ":timezone(Europe/Madrid)",
   ],
+  // The Main ruleset does not require up-to-date branches, and `auto` would
+  // still rebase every automerge PR each time main moves
+  rebaseWhen: "conflicted",
   packageRules: [
     // Auto-merge rules
     {
@@ -32,35 +36,35 @@
       matchManagers: ["github-actions"],
       matchUpdateTypes: ["minor", "patch", "digest"],
       automerge: true,
-      automergeType: "branch",
+      automergeType: "pr",
       minimumReleaseAge: "3 days",
-      ignoreTests: true,
+      ignoreTests: false,
     },
     {
       description: "Auto-merge trusted GitHub Actions",
       matchManagers: ["github-actions"],
-      matchPackageNames: ["/^actions\\//", "/^renovatebot\\//"],
+      matchPackageNames: ["/^actions\\//"],
       matchUpdateTypes: ["minor", "patch", "digest"],
       automerge: true,
-      automergeType: "branch",
+      automergeType: "pr",
       minimumReleaseAge: "1 minute",
-      ignoreTests: true,
+      ignoreTests: false,
     },
     {
       description: "Auto-merge Grafana dashboards",
       matchDatasources: ["custom.grafana-dashboards"],
       matchUpdateTypes: ["major"],
       automerge: true,
-      automergeType: "branch",
-      ignoreTests: true,
+      automergeType: "pr",
+      ignoreTests: false,
     },
     {
-      description: "Auto-merge Renovate Presets",
+      description: "Auto-merge Renovate Presents",
       matchManagers: ["renovate-config"],
       matchUpdateTypes: ["minor", "patch"],
       automerge: true,
-      automergeType: "branch",
-      ignoreTests: true,
+      automergeType: "pr",
+      ignoreTests: false,
     },
     // Grouping rules
     {
@@ -116,8 +120,7 @@
       minimumGroupSize: 2,
     },
     {
-      // After the mise tools catch-all so talos wins its own group; unites the
-      // mise pin, the factory installer image, and the tuppr upgrade version
+      // Unites the factory installer image and the tuppr upgrade version
       description: "Talos Group",
       groupName: "talos",
       matchPackageNames: ["siderolabs/talos"],
@@ -125,6 +128,29 @@
         commitMessageTopic: "{{{groupName}}} group",
       },
       minimumGroupSize: 2,
+    },
+    {
+      // The PostgreSQL major is encoded in the components/cnpg/pgNN directory and is
+      // bound to the object store prefix there, so a major bump is a deliberate
+      // directory copy, never a tag change. Blocking majors outright keeps this
+      // correct without having to edit a version constraint on every upgrade.
+      // Minor/patch bumps (18.6 -> 18.7) flow normally; docker versioning keeps the
+      // -minimal-trixie compatibility suffix pinned.
+      description: "Never bump the CloudNativePG operand across a major version",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/cloudnative-pg/postgresql"],
+      matchUpdateTypes: ["major"],
+      enabled: false,
+    },
+    // Commit message rules
+    {
+      // The flux manager also extracts HelmRelease values images, so the file
+      // name is the only signal that a docker dep is a chart
+      description: "Title OCI chart updates as charts instead of images",
+      matchDatasources: ["docker"],
+      matchFileNames: ["**/ocirepository.yaml"],
+      semanticCommitScope: "helm",
+      commitMessageTopic: "chart {{depName}}",
     },
     // Labeling rules
     {
