@@ -26,12 +26,19 @@ spec:
               PORT: &port 8080
               APP_ORIGIN: https://{{ .Release.Name }}.eudald.gr
               DATA_FILE: /data/requests.json
+              # name=host:port address [mode [agent-url]]; mode is authme (default) or fe (ForgeEssentials, needs the agent)
               SERVERS: |-
                 fc=minecraft-fc-rcon.games.svc.cluster.local:25575 fc.mc.eudald.gr
+                witchery=minecraft-witchery-rcon.games.svc.cluster.local:25575 witchery.mc.eudald.gr fe http://minecraft-witchery-agent.games.svc.cluster.local:8081
               RCON_PASSWORD_FC:
                 valueFrom:
                   secretKeyRef:
                     name: minecraft-fc-secret
+                    key: RCON_PASSWORD
+              RCON_PASSWORD_WITCHERY:
+                valueFrom:
+                  secretKeyRef:
+                    name: minecraft-witchery-secret
                     key: RCON_PASSWORD
             probes:
               liveness: &probes

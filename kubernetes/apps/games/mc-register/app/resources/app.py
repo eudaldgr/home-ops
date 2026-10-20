@@ -8,6 +8,7 @@ import string
 import struct
 import threading
 import time
+import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs
@@ -39,8 +40,23 @@ def load_servers():
         name, _, address = parts[0].partition("=")
         host, _, port = address.rpartition(":")
         key = "RCON_PASSWORD_" + re.sub(r"[^A-Z0-9]", "_", name.upper())
-        servers[name] = {"host": host, "port": int(port), "password": os.environ[key], "address": parts[1] if len(parts) > 1 else ""}
+        # authme: offline mode + AuthMe (Paper). fe: offline-mode Forge with ForgeEssentials auth; the whitelist and
+        # passwords are files written by the server's agent sidecar (4th field: its URL, same token as RCON)
+        mode = parts[2] if len(parts) > 2 else "authme"
+        if mode not in ("authme", "fe") or (mode == "fe" and len(parts) < 4):
+            raise ValueError(f"server {name}: mode must be authme, or fe followed by the agent URL")
+        servers[name] = {"host": host, "port": int(port), "password": os.environ[key], "address": parts[1] if len(parts) > 1 else "",
+                         "mode": mode, "agent": parts[3] if mode == "fe" else ""}
     return servers
+
+
+def forge(server):
+    return SERVERS[server]["mode"] == "fe"
+
+
+def passwordless(request):
+    # Only AuthMe can let paid accounts in without a password
+    return request["edition"] == "java-premium" and SERVERS.get(request["server"], {}).get("mode") != "fe"
 
 
 SERVERS = load_servers()
@@ -87,7 +103,35 @@ def online(server):
 
 def run(server, commands):
     replies = [rcon(server, command) for command in commands]
-    return "\n".join(reply for reply in replies if reply) or "Command sent. AuthMe returned no message; check the server log if needed."
+    return "\n".join(reply for reply in replies if reply) or "Command sent. The server returned no message; check the server log if needed."
+
+
+def agent(server, path, payload):
+    target = SERVERS[server]
+    request = urllib.request.Request(
+        target["agent"].rstrip("/") + path, data=json.dumps(payload).encode(), method="POST",
+        headers={"Authorization": f"Bearer {target['password']}", "Content-Type": "application/json"},
+    )
+    with urllib.request.urlopen(request, timeout=10) as response:
+        return json.load(response)["message"]
+
+
+def fe_register(server, name, password):
+    replies = [
+        agent(server, "/whitelist", {"name": name, "add": True}),
+        agent(server, "/password", {"name": name, "password": password}),
+        rcon(server, "whitelist reload"),
+    ]
+    return "\n".join(reply for reply in replies if reply)
+
+
+def fe_unregister(server, name):
+    replies = [
+        agent(server, "/whitelist", {"name": name, "add": False}),
+        agent(server, "/password", {"name": name, "password": None}),
+        rcon(server, "whitelist reload"),
+    ]
+    return "\n".join(reply for reply in replies if reply)
 
 
 def generate_password():
@@ -134,6 +178,8 @@ def create_request(form, ip):
     edition = form.get("edition", "")
     if server not in SERVERS or edition not in EDITIONS:
         return "error", "Please choose a server and an edition."
+    if forge(server) and edition == "bedrock":
+        return "error", f"{server} is a modded Java server: Bedrock can't join."
     name = player_name(edition, form.get("name", ""))
     if not name:
         return "error", "Invalid name. Java: 3-16 letters, numbers or _. Bedrock: your Xbox gamertag."
@@ -164,14 +210,17 @@ def decide(token, decision):
             STORE.save(requests)
             return "ok", f"Request from {request['name']} rejected.", None
         password = generate_password()
-        commands = [f"authme register {request['name']} {password}"]
-        if request["edition"] == "java-premium":
-            commands.append(f"authme premium {request['name']}")
         try:
-            output = run(request["server"], commands)
+            if forge(request["server"]):
+                output = fe_register(request["server"], request["name"], password)
+            else:
+                commands = [f"authme register {request['name']} {password}"]
+                if request["edition"] == "java-premium":
+                    commands.append(f"authme premium {request['name']}")
+                output = run(request["server"], commands)
         except Exception as error:
             return "error", f"Could not reach {request['server']}: {error}", None
-        request.update(status="approved", updated=time.time(), password=None if request["edition"] == "java-premium" else password)
+        request.update(status="approved", updated=time.time(), password=None if passwordless(request) else password)
         STORE.save(requests)
         return "ok", f"[{request['server']}] {request['name']} approved.\n{output}", password
 
@@ -188,6 +237,8 @@ def manage(form):
     name = form.get("name", "").strip()
     if not PLAYER.fullmatch(name):
         return "error", "Invalid player name.", None
+    if forge(server) and action in ("premium", "freemium"):
+        return "error", f"{server} has no premium mode: everyone logs in with a password.", None
     password = form.get("password", "")
     generated = None
     if action in ("register", "password"):
@@ -203,7 +254,15 @@ def manage(form):
         "freemium": [f"authme freemium {name}"],
     }[action]
     try:
-        return "ok", f"[{server}] {run(server, commands)}", generated
+        if forge(server):
+            output = {
+                "register": lambda: fe_register(server, name, password),
+                "password": lambda: agent(server, "/password", {"name": name, "password": password}),
+                "unregister": lambda: fe_unregister(server, name),
+            }[action]()
+        else:
+            output = run(server, commands)
+        return "ok", f"[{server}] {output}", generated
     except Exception as error:
         return "error", f"Could not reach {server}: {error}", None
 
@@ -352,12 +411,14 @@ def server_options(selected=None, with_state=False):
 
 def public_page(nonce, status=None, message=None, link=None):
     editions = "".join(f'<option value="{key}">{esc(label)}</option>' for key, label in EDITIONS.items())
+    modded = ", ".join(name for name in SERVERS if forge(name))
+    modded_hint = f" {modded}: Java only, and everyone gets a password (paid accounts too)." if modded else ""
     body = f"""{result_box(status, message, link=link)}
 <form method="post" action="/request" class="card">
   <h2>Request access</h2>
   <label class="field"><span>Server</span><select name="server">{server_options()}</select></label>
   <label class="field"><span>Edition</span><select name="edition">{editions}</select>
-    <small>Paid Java accounts join without a password. Everyone else gets a password when approved.</small></label>
+    <small>Paid Java accounts join without a password. Everyone else gets a password when approved.{esc(modded_hint)}</small></label>
   <label class="field"><span>Player name</span>
     <input type="text" name="name" required maxlength="16" autocomplete="off" spellcheck="false" placeholder="Java username or Xbox gamertag"></label>
   <label class="field"><span>Who are you?</span>
@@ -378,10 +439,13 @@ def status_page(nonce, token, request, reveal=False):
         content = f"<p>Your request for <strong>{esc(request['name'])}</strong> was not approved.</p>"
     else:
         content = f"<p>Your request for <strong>{esc(request['name'])}</strong> was approved. Connect to <strong>{esc(address)}</strong>.</p>"
-        if request["edition"] == "java-premium":
+        login = "/auth login <password>" if server.get("mode") == "fe" else "/login <password>"
+        if server.get("mode") == "fe":
+            content += f"<p class='hint'>Use exactly <strong>{esc(request['name'])}</strong> as your username: capital letters matter.</p>"
+        if passwordless(request):
             content += "<p class='hint'>You have a paid Java account: just join, no password needed.</p>"
         elif reveal and request.get("password"):
-            content += result_box("ok", "Your password. Log in with /login <password> when you join.", password=request["password"])
+            content += result_box("ok", f"Your password. Log in with {login} when you join.", password=request["password"])
         elif request.get("password"):
             content += (
                 f'<form method="post" action="/status/{esc(token)}"><button class="primary">Show my password</button></form>'
@@ -424,6 +488,11 @@ def admin_page(nonce, status=None, message=None, password=None, form=None):
     if recent_html:
         recent_html = f"<hr><h2>Recent decisions</h2>{recent_html}"
 
+    modded = ", ".join(name for name in SERVERS if forge(name))
+    modded_hint = (
+        f"\n      <small>{esc(modded)}: ForgeEssentials accounts (whitelist + password). Names are case-sensitive; premium does not apply.</small>"
+        if modded else ""
+    )
     checked = {key: " checked" if tab == key else "" for key in ("requests", "new", "password", "manage")}
     count = f" ({len(pending)})" if pending else ""
     body = f"""{result_box(status, message, password)}
@@ -444,7 +513,7 @@ def admin_page(nonce, status=None, message=None, password=None, form=None):
     <label class="field"><span>Server</span><select name="server">{server_options(form.get("server"), with_state=True)}</select></label>
     <label class="field"><span>Player</span>
       <input type="text" name="name" autocomplete="off" spellcheck="false" value="{esc(form.get('name', '')) if status == 'error' or tab != 'new' else ''}" placeholder="Steve or .BedrockGamertag">
-      <small>Java: the username. Bedrock: the gamertag with a leading dot.</small></label>
+      <small>Java: the username. Bedrock: the gamertag with a leading dot.</small>{modded_hint}</label>
     <label class="field panel p-secret"><span>Password</span>
       <input type="text" name="password" autocomplete="off" spellcheck="false" placeholder="Leave empty to generate one"></label>
     <div class="panel p-new">
@@ -471,7 +540,7 @@ def admin_page(nonce, status=None, message=None, password=None, form=None):
         f'<script nonce="{nonce}">document.querySelectorAll(".shell > input[type=radio]").forEach(r=>r.addEventListener("change",()=>'
         'document.querySelector(".tabsync").value=r.value))</script>'
     )
-    return layout(nonce, "Minecraft admin", "Requests and AuthMe accounts", body + sync, ADMIN_TABS, copy=bool(password))
+    return layout(nonce, "Minecraft admin", "Requests and player accounts", body + sync, ADMIN_TABS, copy=bool(password))
 
 
 class Handler(BaseHTTPRequestHandler):
