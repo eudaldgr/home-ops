@@ -63,13 +63,16 @@ spec:
                     key: CF_API_KEY
               # Pinned file IDs: most 1.7.10 files on CurseForge lack the Forge loader tag, so "latest" can't be resolved
               # Clients also need JourneyMap (client-only)
+              # Numeric project IDs: the CurseForge search endpoint (slug lookup) is forbidden for this API key
+              # 220318 biomes-o-plenty, 69673 witchery, 221857 pams-harvestcraft, 222213 codechickencore,
+              # 222211 notenoughitems, 74735 forge-essentials
               CURSEFORGE_FILES: |-
-                biomes-o-plenty:2499612
-                witchery:2234410
-                pams-harvestcraft:2270206
-                codechickencore:3293859
-                notenoughitems:2302312
-                forge-essentials:8712260
+                220318:2499612
+                69673:2234410
+                221857:2270206
+                222213:3293859
+                222211:2302312
+                74735:8712260
             probes:
               liveness:
                 enabled: true
