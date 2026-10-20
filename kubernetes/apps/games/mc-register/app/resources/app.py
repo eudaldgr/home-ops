@@ -134,6 +134,17 @@ def fe_unregister(server, name):
     return "\n".join(reply for reply in replies if reply)
 
 
+def set_password(server, name, password):
+    if forge(server):
+        return agent(server, "/password", {"name": name, "password": password})
+    return run(server, [f"authme password {name} {password}"])
+
+
+def choosing_password(request):
+    # Requests approved before players picked a password up front: "password" was the unrevealed generated one
+    return request["status"] == "approved" and bool(request.get("choose_password") or request.get("password"))
+
+
 def generate_password():
     return "".join(secrets.choice(ALPHABET) for _ in range(12))
 
@@ -184,6 +195,13 @@ def create_request(form, ip):
     if not name:
         return "error", "Invalid name. Java: 3-16 letters, numbers or _. Bedrock: your Xbox gamertag."
     note = form.get("note", "").strip()[:300]
+    password = None
+    if not passwordless({"edition": edition, "server": server}):
+        password = form.get("password", "")
+        if not PASSWORD.fullmatch(password):
+            return "error", "Invalid password: 5-30 characters, no spaces."
+        if form.get("confirm") != password:
+            return "error", "The two passwords do not match."
     with STORE.lock:
         requests = STORE.load()
         pending = [r for r in requests.values() if r["status"] == "pending"]
@@ -194,7 +212,7 @@ def create_request(form, ip):
         token = secrets.token_urlsafe(24)
         now = time.time()
         requests[token] = {"server": server, "edition": edition, "name": name, "note": note, "ip": ip,
-                           "status": "pending", "created": now, "updated": now, "password": None}
+                           "status": "pending", "created": now, "updated": now, "password": password}
         STORE.save(requests)
     return "ok", token
 
@@ -206,10 +224,12 @@ def decide(token, decision):
         if not request or request["status"] != "pending":
             return "error", "This request no longer exists or was already handled.", None
         if decision == "reject":
+            request.pop("password", None)
             request.update(status="rejected", updated=time.time())
             STORE.save(requests)
             return "ok", f"Request from {request['name']} rejected.", None
-        password = generate_password()
+        chosen = request.get("password")
+        password = chosen or generate_password()
         try:
             if forge(request["server"]):
                 output = fe_register(request["server"], request["name"], password)
@@ -220,9 +240,10 @@ def decide(token, decision):
                 output = run(request["server"], commands)
         except Exception as error:
             return "error", f"Could not reach {request['server']}: {error}", None
-        request.update(status="approved", updated=time.time(), password=None if passwordless(request) else password)
+        request.pop("password", None)
+        request.update(status="approved", updated=time.time(), choose_password=not chosen and not passwordless(request))
         STORE.save(requests)
-        return "ok", f"[{request['server']}] {request['name']} approved.\n{output}", password
+        return "ok", f"[{request['server']}] {request['name']} approved.\n{output}", None
 
 
 def manage(form):
@@ -299,7 +320,7 @@ form > input[type=radio], .shell > input[type=radio] { position: absolute; opaci
 .field { display: grid; gap: .3rem; margin-bottom: 1rem; }
 .field span { font-weight: 600; font-size: .9rem; }
 .field small, .hint { color: var(--muted); font-size: .8rem; }
-input[type=text], select, textarea {
+input[type=text], input[type=password], select, textarea {
   font: inherit; color: inherit; width: 100%; padding: .6rem .75rem; border-radius: .6rem;
   border: 1px solid var(--line); background: var(--bg);
 }
@@ -412,15 +433,20 @@ def server_options(selected=None, with_state=False):
 def public_page(nonce, status=None, message=None, link=None):
     editions = "".join(f'<option value="{key}">{esc(label)}</option>' for key, label in EDITIONS.items())
     modded = ", ".join(name for name in SERVERS if forge(name))
-    modded_hint = f" {modded}: Java only, and everyone gets a password (paid accounts too)." if modded else ""
+    modded_hint = f" {modded}: Java only, and everyone needs a password (paid accounts too)." if modded else ""
     body = f"""{result_box(status, message, link=link)}
 <form method="post" action="/request" class="card">
   <h2>Request access</h2>
   <label class="field"><span>Server</span><select name="server">{server_options()}</select></label>
   <label class="field"><span>Edition</span><select name="edition">{editions}</select>
-    <small>Paid Java accounts join without a password. Everyone else gets a password when approved.{esc(modded_hint)}</small></label>
+    <small>Paid Java accounts join without a password.{esc(modded_hint)}</small></label>
   <label class="field"><span>Player name</span>
     <input type="text" name="name" required maxlength="16" autocomplete="off" spellcheck="false" placeholder="Java username or Xbox gamertag"></label>
+  <label class="field"><span>Password</span>
+    <input type="password" name="password" maxlength="30" autocomplete="new-password">
+    <small>5-30 characters, no spaces. You will log in with it in game. Leave it empty if you have a paid Java account (not needed there).</small></label>
+  <label class="field"><span>Repeat the password</span>
+    <input type="password" name="confirm" maxlength="30" autocomplete="new-password"></label>
   <label class="field"><span>Who are you?</span>
     <textarea name="note" maxlength="300" placeholder="So the admin knows who is asking"></textarea></label>
   <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
@@ -430,7 +456,7 @@ def public_page(nonce, status=None, message=None, link=None):
     return layout(nonce, "Minecraft access", "Ask to join the server", body, copy=bool(link))
 
 
-def status_page(nonce, token, request, reveal=False):
+def status_page(nonce, token, request, status=None, message=None):
     server = SERVERS.get(request["server"], {})
     address = server.get("address") or request["server"]
     if request["status"] == "pending":
@@ -442,19 +468,23 @@ def status_page(nonce, token, request, reveal=False):
         login = "/auth login <password>" if server.get("mode") == "fe" else "/login <password>"
         if server.get("mode") == "fe":
             content += f"<p class='hint'>Use exactly <strong>{esc(request['name'])}</strong> as your username: capital letters matter.</p>"
+        content += result_box(status, message)
         if passwordless(request):
             content += "<p class='hint'>You have a paid Java account: just join, no password needed.</p>"
-        elif reveal and request.get("password"):
-            content += result_box("ok", f"Your password. Log in with {login} when you join.", password=request["password"])
-        elif request.get("password"):
-            content += (
-                f'<form method="post" action="/status/{esc(token)}"><button class="primary">Show my password</button></form>'
-                "<p class='hint'>The password is shown only once.</p>"
-            )
-        else:
-            content += "<p class='hint'>Your password was already shown. Ask the admin if you lost it.</p>"
+        elif choosing_password(request):
+            content += f"""<form method="post" action="/status/{esc(token)}">
+  <label class="field"><span>Choose your password</span>
+    <input type="password" name="password" minlength="5" maxlength="30" autocomplete="new-password" required>
+    <small>5-30 characters, no spaces. You will log in with {esc(login)} when you join.</small></label>
+  <label class="field"><span>Repeat it</span>
+    <input type="password" name="confirm" minlength="5" maxlength="30" autocomplete="new-password" required></label>
+  <button class="primary">Set my password</button>
+</form>
+<p class='hint'>You can set it only once from this page.</p>"""
+        elif status != "ok":
+            content += f"<p class='hint'>Log in with {esc(login)} using the password you chose. Ask the admin if you forget it.</p>"
     body = f'<div class="card"><h2>Request status <span class="badge {esc(request["status"])}">{esc(request["status"])}</span></h2>{content}</div>'
-    return layout(nonce, "Minecraft access", "Request status", body, copy=reveal)
+    return layout(nonce, "Minecraft access", "Request status", body)
 
 
 def admin_page(nonce, status=None, message=None, password=None, form=None):
@@ -614,20 +644,29 @@ class Handler(BaseHTTPRequestHandler):
             if value is None:
                 return self.html(public_page, "ok", "Request sent.")
             link = f"{ORIGIN}/status/{value}"
-            return self.html(public_page, "ok", "Request sent. Save this link to check its status and get your password once it is approved:", link=link)
+            return self.html(public_page, "ok", "Request sent. Save this link to check whether it was approved:", link=link)
         if path.startswith("/status/"):
+            token = path.removeprefix("/status/")
             with STORE.lock:
-                token = path.removeprefix("/status/")
                 requests = STORE.load()
                 request = requests.get(token) if TOKEN.fullmatch(token) else None
                 if not request:
                     return self.reply(404, "not found", "text/plain")
-                shown = dict(request)
-                if request["status"] == "approved" and request.get("password"):
-                    request["password"] = None
-                    request["updated"] = time.time()
-                    STORE.save(requests)
-            return self.html(status_page, token, shown, reveal=True)
+                if not choosing_password(request):
+                    return self.html(status_page, token, request)
+                password = form.get("password", "")
+                if form.get("confirm") != password:
+                    return self.html(status_page, token, request, "error", "The two passwords do not match.")
+                if not PASSWORD.fullmatch(password):
+                    return self.html(status_page, token, request, "error", "Invalid password: 5-30 characters, no spaces.")
+                try:
+                    set_password(request["server"], request["name"], password)
+                except Exception:
+                    return self.html(status_page, token, request, "error", "The server could not be reached. Try again in a minute.")
+                request.pop("password", None)
+                request.update(choose_password=False, updated=time.time())
+                STORE.save(requests)
+            return self.html(status_page, token, request, "ok", "Password set. You can join the server now.")
         if path == "/admin/request":
             decision = form.get("decision")
             if decision not in ("approve", "reject"):

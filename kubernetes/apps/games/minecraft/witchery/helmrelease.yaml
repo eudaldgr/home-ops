@@ -40,11 +40,14 @@ spec:
               ONLINE_MODE: false
               ENABLE_WHITELIST: true
               ENFORCE_WHITELIST: true
-              OPS: eudaldgr:offline
+              # Offline UUID of eudaldgr (md5 "OfflinePlayer:<name>"): for 1.7.10 mc-image-helper ignores the
+              # ":offline" suffix and stores the Mojang UUID, which never matches in offline mode
+              OPS: 40c7bf28-61ce-3b6c-a03d-7a0571f708c9
               EXISTING_OPS_FILE: SYNCHRONIZE
               MAX_PLAYERS: 10
               PVP: true
-              SPAWN_PROTECTION: 10
+              # Everyone can build at spawn (vanilla spawn protection only exempts OPs)
+              SPAWN_PROTECTION: 0
               VIEW_DISTANCE: 10
               PLAYER_IDLE_TIMEOUT: 30
               ENABLE_STATUS: true
