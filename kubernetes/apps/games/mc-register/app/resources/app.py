@@ -552,7 +552,9 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(data)))
         self.send_header("Cache-Control", "no-store")
-        self.send_header("Referrer-Policy", "no-referrer")
+        # same-origin, not no-referrer: with no-referrer browsers send "Origin: null" on form POSTs,
+        # which fails the Origin check; external sites still get no referrer (status tokens don't leak)
+        self.send_header("Referrer-Policy", "same-origin")
         self.send_header("X-Robots-Tag", "noindex")
         self.send_header(
             "Content-Security-Policy",
