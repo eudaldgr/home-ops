@@ -40,6 +40,8 @@ spec:
       namespace: downloads
     - name: grafana
       namespace: o11y
+    - name: maintainerr
+      namespace: media
     - name: mc-register
       namespace: games
 ---
