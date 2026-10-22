@@ -60,6 +60,8 @@ spec:
       namespace: default
     - name: memos
       namespace: default
+    - name: resume
+      namespace: default
     - name: hass
       namespace: home-automation
     - name: immich
