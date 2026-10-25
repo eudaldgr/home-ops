@@ -23,6 +23,7 @@ spec:
               TZ: Europe/Madrid
               TELEMETRY: "off"
               UI_PORT: &port 6246
+              NODE_OPTIONS: --max-old-space-size=768
             probes:
               liveness:
                 enabled: true
@@ -41,7 +42,7 @@ spec:
                 cpu: 5m
                 memory: 128Mi
               limits:
-                memory: 512Mi
+                memory: 1Gi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
