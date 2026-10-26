@@ -32,3 +32,12 @@ spec:
           for: 5m
           labels:
             severity: critical
+
+        - alert: SynologyThermalAbnormal
+          expr: thermalStatus{job="synology"} == 2
+          annotations:
+            summary: >-
+              Synology {{ $labels.instance }} thermal status is abnormal
+          for: 5m
+          labels:
+            severity: critical
