@@ -29,14 +29,30 @@ spec:
         urlPrefix: /
         ssl: false
         prometheusEndpoint: http://prometheus-operated.o11y.svc.cluster.local:9090
+      logCollector:
+        enabled: false
       mgr:
         modules:
           - name: pg_autoscaler
             enabled: true
       resources:
+        mon:
+          requests:
+            cpu: 100m
         osd:
+          requests:
+            cpu: 250m
           limits:
             memory: 8Gi # Required for bootstrap
+        mgr:
+          requests:
+            cpu: 100m
+        mgr-sidecar:
+          requests:
+            cpu: 50m
+        crashcollector:
+          requests:
+            cpu: 15m
       security:
         cephx:
           allowedCiphers: [aes256k]
