@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/vegops/lidarr
-              tag: 3.1.0.4875-r1@sha256:8bd76de3180149fd56d2ab48d02061abea024996da66eed2d0d2a9ee62dcba2c
+              tag: 3.1.0.4875-r1@sha256:53e6875458bbf7fd378cb2d018188b424469cf504e5b80c8128e4dfb3601208a
             env:
               LIDARR__APP__INSTANCENAME: Lidarr
               LIDARR__APP__THEME: dark
