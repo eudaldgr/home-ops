@@ -24,7 +24,7 @@ spec:
           app:
             image:
               repository: ghcr.io/vegops/configarr
-              tag: 1.32.0-r0@sha256:61a23738221ad8bb7464801234ce0a9336e57fd46b4324c251c34184b8fef504
+              tag: 1.32.0-r0@sha256:ff991dc76266177860e0e19bf02f3e6f772f8e5079d331b8761d06d7b5544a10
             env:
               TZ: Europe/Madrid
             envFrom:
