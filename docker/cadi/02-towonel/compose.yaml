@@ -3,7 +3,7 @@ name: towonel
 services:
   towonel-hub:
     # renovate: datasource=docker depName=codeberg.org/towonel/towonel-node
-    image: codeberg.org/towonel/towonel-node:1.13.2@sha256:3332f2babea99f5ea57c40e2e64fff354fe49fe75f0a8cabe94b9cabb05cab34
+    image: codeberg.org/towonel/towonel-node:1.13.4@sha256:2b21f73776524e5c06e661f27f712352ce83e14331dafd6a66d59fabe0da1274
     container_name: towonel-hub
     user: "10001:10001"
     environment:
