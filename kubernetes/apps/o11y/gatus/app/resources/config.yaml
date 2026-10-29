@@ -41,8 +41,8 @@ ui:
   buttons:
     - name: Github
       link: https://github.com/eudaldgr
-    - name: Homelab
-      link: https://github.com/eudaldgr/homelab
+    - name: Home-Ops
+      link: https://github.com/eudaldgr/home-ops
 
 web:
   port: ${GATUS_WEB_PORT}

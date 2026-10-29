@@ -66,6 +66,9 @@ spec:
       namespace: home-automation
     - name: immich
       namespace: immich
+  customClaims:
+    - key: immich_quota
+      value: "2048"
 ---
 apiVersion: pocketid.internal/v1alpha1
 kind: PocketIDUserGroup
@@ -79,7 +82,7 @@ spec:
       namespace: immich
   customClaims:
     - key: immich_quota
-      value: "128"
+      value: "256"
 ---
 apiVersion: pocketid.internal/v1alpha1
 kind: PocketIDUserGroup
@@ -88,6 +91,12 @@ metadata:
 spec:
   name: friends
   friendlyName: Friends
+  allowedOIDCClients:
+    - name: immich
+      namespace: immich
+  customClaims:
+    - key: immich_quota
+      value: "128"
 ---
 apiVersion: pocketid.internal/v1alpha1
 kind: PocketIDUserGroup

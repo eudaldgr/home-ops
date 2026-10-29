@@ -17,7 +17,7 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/vegops/sonarr
+              repository: ghcr.io/eudaldgr-labs/sonarr
               tag: 4.0.17.2952-r2@sha256:33ab5784d9115108e4f0b851a697af3bdcf77f87d7dc06443c8a6f042bc086a9
             env:
               SONARR__APP__INSTANCENAME: Sonarr

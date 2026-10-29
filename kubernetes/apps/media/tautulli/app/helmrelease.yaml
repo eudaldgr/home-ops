@@ -17,7 +17,7 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/vegops/tautulli
+              repository: ghcr.io/eudaldgr-labs/tautulli
               tag: 2.17.1-r2@sha256:f18a7d4386be5ab27d363764b1fd8e136aad455ac6cd80a3a615716db936a95d
             env:
               TZ: Europe/Madrid

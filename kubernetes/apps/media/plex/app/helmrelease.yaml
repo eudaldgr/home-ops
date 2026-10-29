@@ -17,7 +17,7 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/vegops/plex
+              repository: ghcr.io/eudaldgr-labs/plex
               tag: 1.43.2.10687-r2@sha256:d4813b64210cabed725ea6f2f86855eacb8f49cdfd3b9749a77e5d9dc0c464fc
             env:
               TZ: Europe/Madrid

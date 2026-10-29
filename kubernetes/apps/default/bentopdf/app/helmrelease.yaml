@@ -17,7 +17,7 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/vegops/bentopdf
+              repository: ghcr.io/eudaldgr-labs/bentopdf
               tag: 2.8.10-r0@sha256:3a92072e00127986523744fe8e1eda711b0cf80c28faba320937503617196185
             env:
               TZ: Europe/Madrid

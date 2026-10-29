@@ -17,7 +17,7 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/vegops/prowlarr
+              repository: ghcr.io/eudaldgr-labs/prowlarr
               tag: 2.4.0.5397-r2@sha256:a410a53ef3178cc0ac1d18181944cefe72d8a3287d1435cb2dc630877bfbcc60
             env:
               PROWLARR__APP__INSTANCENAME: Prowlarr

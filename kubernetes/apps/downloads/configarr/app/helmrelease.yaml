@@ -23,7 +23,7 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/vegops/configarr
+              repository: ghcr.io/eudaldgr-labs/configarr
               tag: 1.38.0-r0@sha256:8781ff890d650d43a1773d2f94d8b79c7ecbb029d5da95e087adb11fe4101847
             env:
               TZ: Europe/Madrid

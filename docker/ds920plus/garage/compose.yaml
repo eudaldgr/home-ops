@@ -2,13 +2,13 @@
 name: garage
 services:
   chown:
-    image: ghcr.io/vegops/chown:latest
+    image: ghcr.io/eudaldgr-labs/chown:latest
     container_name: garage_chown_1
     volumes:
       - ${S3_DATA_DIR}/garage:/chown
     command: "-R 65532:65532 /chown"
   app:
-    image: ghcr.io/vegops/garage:2.3.0-r0@sha256:1d5380c70ade81ffa23f1a57d495db6ee4587045b7e71628c97fb590ce7ecd3c
+    image: ghcr.io/eudaldgr-labs/garage:2.3.0-r0@sha256:1d5380c70ade81ffa23f1a57d495db6ee4587045b7e71628c97fb590ce7ecd3c
     container_name: garage_app_1
     user: 65532:65532
     command: ["server"]
@@ -33,7 +33,7 @@ services:
       - 9002:3903
     restart: unless-stopped
   webui:
-    image: ghcr.io/vegops/garage-webui:1.1.0-r0@sha256:858bfa6ce1290b7d903645db573ed730fb3a61c92dcac373f72a09ff1006283e
+    image: ghcr.io/eudaldgr-labs/garage-webui:1.1.0-r0@sha256:858bfa6ce1290b7d903645db573ed730fb3a61c92dcac373f72a09ff1006283e
     container_name: garage_webui_1
     depends_on:
       app:

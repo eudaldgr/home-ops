@@ -1,28 +1,18 @@
 <div align="center">
 
-# Eudald's Homelab
+<img src="https://avatars.githubusercontent.com/u/50481714?raw=true" width="144px" height="144px"/>
 
-_GitOps-managed home infrastructure powered by Talos, Kubernetes, OpenTofu, Flux CD, and Cilium._
+## My Home Operations repository
 
-</div>
-
-<div align="center">
+_... managed with Flux, Renovate, and GitHub Actions_
 
 [![Status-Page](https://kromgo.eudald.gr/badges/home_status_page)](https://status.eudald.gr)&nbsp;&nbsp;
 [![Alertmanager](https://kromgo.eudald.gr/badges/home_heartbeat)](https://cadi-gatus.eudald.gr)
-
-</div>
-
-<div align="center">
 
 [![Talos](https://kromgo.eudald.gr/badges/talos_version)](https://talos.dev)&nbsp;&nbsp;
 [![Kubernetes](https://kromgo.eudald.gr/badges/kubernetes_version)](https://kubernetes.io)&nbsp;&nbsp;
 [![Flux](https://kromgo.eudald.gr/badges/flux_version)](https://fluxcd.io)&nbsp;&nbsp;
 ![Renovate](https://img.shields.io/badge/enabled-blue?logo=renovate)
-
-</div>
-
-<div align="center">
 
 [![Age](https://kromgo.eudald.gr/badges/cluster_birth_age)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
 [![Uptime](https://kromgo.eudald.gr/badges/cluster_uptime_age)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;

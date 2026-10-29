@@ -3,7 +3,7 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: &name homelab-runner
+  name: &name home-ops-runner
 spec:
   endpointSelector:
     matchLabels:

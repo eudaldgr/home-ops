@@ -17,7 +17,7 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/vegops/radarr
+              repository: ghcr.io/eudaldgr-labs/radarr
               tag: 6.4.4.10685-r0@sha256:034e4beaaad870d10c14bcb6511944b9e505780581db5eb3e0fd22cac929a0de
             env:
               RADARR__APP__INSTANCENAME: Radarr

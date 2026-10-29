@@ -9,7 +9,7 @@ services:
       HTTP_PORT: 8881
       LOG_LEVEL: info
       POLL_CONFIG: |-
-        - url: https://github.com/eudaldgr/homelab.git
+        - url: https://github.com/eudaldgr/home-ops.git
           reference: main
           interval: 3600
           target: updater
