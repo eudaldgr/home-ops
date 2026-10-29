@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/vegops/bentopdf
-              tag: 2.8.10-r0@sha256:a2c51b4ce7f3ca5568b24a5e103f04ea88ac074be6896e1639586411992e0777
+              tag: 2.8.10-r0@sha256:3a92072e00127986523744fe8e1eda711b0cf80c28faba320937503617196185
             env:
               TZ: Europe/Madrid
             probes:
