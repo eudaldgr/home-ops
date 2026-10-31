@@ -33,7 +33,7 @@ services:
       - 9002:3903
     restart: unless-stopped
   webui:
-    image: ghcr.io/eudaldgr-labs/garage-webui:1.1.0-r0@sha256:858bfa6ce1290b7d903645db573ed730fb3a61c92dcac373f72a09ff1006283e
+    image: ghcr.io/eudaldgr-labs/garage-webui:1.1.0-r0@sha256:283bb46dc53b10991799835b8ab00fc6568f9d711fafc2a2ac512da0c482c322
     container_name: garage_webui_1
     depends_on:
       app:
