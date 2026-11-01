@@ -24,7 +24,7 @@ spec:
           app:
             image:
               repository: ghcr.io/eudaldgr-labs/configarr
-              tag: 1.38.0-r0@sha256:e81c60e890cae1bc0908332c569cb77a6405c781a1d87212d9906074b64b0781
+              tag: 1.38.0-r0@sha256:9db7362b38f24b0c2f01adc780b7f4bf48776fb43088df5b519045a4f70652ea
             env:
               TZ: Europe/Madrid
             envFrom:
