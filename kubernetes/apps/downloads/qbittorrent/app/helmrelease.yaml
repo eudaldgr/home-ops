@@ -16,7 +16,7 @@ spec:
           app:
             image:
               repository: ghcr.io/eudaldgr-labs/qbittorrent
-              tag: 5.3.0-r1@sha256:9d61d43b6c1924f4ba0fa63f370736e50ccfee7bc7c3a6fa17d85ac5f32c2063
+              tag: 5.3.0-r1@sha256:f29262579a8186ebe132d87f6e96a0e298f140648fe13f33fd17bb20ba13ac22
             env:
               TZ: Europe/Madrid
               QBT_WEBUI_PORT: &port 80
