@@ -62,6 +62,8 @@ spec:
       namespace: default
     - name: resume
       namespace: default
+    - name: romm
+      namespace: games
     - name: hass
       namespace: home-automation
     - name: immich
