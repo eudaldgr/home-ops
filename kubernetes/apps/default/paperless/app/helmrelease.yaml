@@ -1,0 +1,92 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: paperless
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: paperless
+  interval: 1h
+  values:
+    controllers:
+      paperless:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        # No pod securityContext: the image starts as root to install the extra OCR
+        # languages and then drops to USERMAP_UID/GID (1000) via s6
+        containers:
+          app:
+            image:
+              repository: ghcr.io/paperless-ngx/paperless-ngx
+              tag: 3.3.3@sha256:dba0242c1df1843643df4eb50ce5639f3a7900f414879088fd5bed8eaf2d456d
+            env:
+              PAPERLESS_TIME_ZONE: Europe/Madrid
+              PAPERLESS_URL: https://{{ .Release.Name }}.eudald.gr
+              PAPERLESS_PORT: &port 8000
+              PAPERLESS_WEBSERVER_WORKERS: 2
+              PAPERLESS_TASK_WORKERS: 2
+              PAPERLESS_REDIS: redis://{{ .Release.Name }}-dragonfly:6379
+              PAPERLESS_DATA_DIR: /data/data
+              PAPERLESS_MEDIA_ROOT: /data/media
+              PAPERLESS_CONSUMPTION_DIR: /data/consume
+              PAPERLESS_EXPORT_DIR: /data/export
+              PAPERLESS_CONSUMER_RECURSIVE: true
+              PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: true
+              # eng and spa ship with the image, cat is installed at startup
+              PAPERLESS_OCR_LANGUAGES: cat
+              PAPERLESS_OCR_LANGUAGE: cat+spa+eng
+              PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
+              # Expanded by the kubelet into PAPERLESS_SOCIALACCOUNT_PROVIDERS (sorted before it)
+              OIDC_CLIENT_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: "{{ .Release.Name }}-oidc"
+                    key: client-id
+              OIDC_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: "{{ .Release.Name }}-oidc"
+                    key: client-secret
+              PAPERLESS_SOCIALACCOUNT_PROVIDERS: >-
+                {"openid_connect": {"OAUTH_PKCE_ENABLED": true, "APPS": [{"provider_id": "pocketid",
+                "name": "Pocket ID", "client_id": "$(OIDC_CLIENT_ID)", "secret": "$(OIDC_CLIENT_SECRET)",
+                "settings": {"server_url": "https://auth.eudald.gr"}}]}}
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 60
+                  periodSeconds: 10
+            resources:
+              requests:
+                cpu: 25m
+                memory: 512Mi
+              limits:
+                memory: 4Gi
+    service:
+      app:
+        ports:
+          http:
+            port: 80
+            targetPort: *port
+    route:
+      app:
+        hostnames:
+          - "{{ .Release.Name }}.eudald.gr"
+        parentRefs:
+          - name: envoy-external
+            namespace: network
+    persistence:
+      data:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /data
