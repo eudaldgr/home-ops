@@ -5,7 +5,7 @@ secrets:
     file: /volume2/docker/doco-cd/1pw_token
 services:
   app:
-    image: ghcr.io/kimdre/doco-cd:0.131.0@sha256:33761af0adb58696bf7892604a4a319cee6164aa5cb17e5b4b4f5c8cb248a603
+    image: ghcr.io/kimdre/doco-cd:0.133.2@sha256:8ca3cf6701f70ac3af4c5d726e542fe3a854a038149375f87222ec2719b3c975
     container_name: doco-cd
     environment:
       DEPLOY_CONFIG_BASE_DIR: ./docker/ds920plus/
