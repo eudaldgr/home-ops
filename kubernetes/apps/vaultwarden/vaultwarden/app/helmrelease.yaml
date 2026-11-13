@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/eudaldgr-labs/vaultwarden
-              tag: 1.37.4-r1@sha256:061caa691d60b6187e9383197f9550000c3b42c4deda5d6788677374e5c7f6a5
+              tag: 1.37.4-r1@sha256:bf76a6c90f22c42de31ab60040e39ab45934d84a3eacd3c5ac2e6e3a2484fb3b
             env:
               DOMAIN: https://bitwarden.eudald.gr
               SIGNUPS_ALLOWED: "false"
