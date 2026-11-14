@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/reactive-resume/reactive-resume
-              tag: v6.0.7@sha256:e15168246afd73d5c37f38ad303a47bd2ee5ba4d8fa1b9c7df960c22f9e66f60
+              tag: v6.1.1@sha256:3d6eacb7dca6f1bbafbf7a5be810ec3fb6cfe32732e831a11def9dc2eb8112d4
             env:
               TZ: Europe/Madrid
               APP_URL: https://resume.eudald.gr
