@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/eudaldgr-labs/radarr
-              tag: 6.4.4.10685-r0@sha256:d9cccc86e28d955d1b43813e8abf27afeb1d673ea2b67e6628425da5784e8981
+              tag: 6.4.4.10685-r0@sha256:30b12b7cc1edafc41f18a3b5a0ed71e9d9af5366c9f66f2eedb0321572c2ab2b
             env:
               RADARR__APP__INSTANCENAME: Radarr
               RADARR__APP__THEME: dark
