@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: docker.io/library/python
-              tag: 3.15.2-alpine3.24@sha256:1656b7eaf309cadf99069ea9de335c7f67a8355789cfc6f1835a05818996f081
+              tag: 3.15.2-alpine3.24@sha256:0f9552bb28711333da16915ec146f5e6bb44a7fdac9ced15dc17c2e0206346dd
             command: ["python", "-B", "/app/app.py"]
             env:
               TZ: Europe/Madrid
