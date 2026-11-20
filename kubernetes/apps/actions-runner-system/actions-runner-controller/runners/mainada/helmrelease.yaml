@@ -1,0 +1,107 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+# Org-level scale set for MainadaApp. Workflows use `runs-on: mainada-runner`.
+# DinD is spelled out (containerMode left empty, as the chart recommends for customisation) so the
+# daemon is pinned and has resources: the pgTAP job runs `supabase start` (~8 containers).
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &name mainada-runner
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: mainada-runner
+  interval: 1h
+  values:
+    githubConfigUrl: https://github.com/MainadaApp
+    githubConfigSecret: mainada-runner-secret
+    minRunners: 0
+    maxRunners: 3
+    controllerServiceAccount:
+      name: actions-runner-controller
+      namespace: actions-runner-system
+    template:
+      metadata:
+        labels:
+          runner: *name
+      spec:
+        automountServiceAccountToken: false
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 100
+                podAffinityTerm:
+                  labelSelector:
+                    matchLabels:
+                      runner: *name
+                  topologyKey: kubernetes.io/hostname
+        initContainers:
+          - name: init-dind-externals
+            image: &runner ghcr.io/home-operations/actions-runner:2.338.2@sha256:2dd7caa094a425c041539447cb0e6ae63cda10b5242773764683b695b8fa5613
+            command: ["cp", "-r", "/home/runner/externals/.", "/home/runner/tmpDir/"]
+            volumeMounts:
+              - name: dind-externals
+                mountPath: /home/runner/tmpDir
+          - name: dind
+            image: docker:29.9.3-dind@sha256:7bf70dcb85c822e3fa6f2d332143e474b99147b9d7b39102b0cfe8b04a7dd61b
+            restartPolicy: Always
+            args:
+              - dockerd
+              - --host=unix:///var/run/docker.sock
+              - --group=$(DOCKER_GROUP_GID)
+            env:
+              - name: DOCKER_GROUP_GID
+                value: "123"
+            securityContext:
+              privileged: true
+            startupProbe:
+              exec:
+                command: ["docker", "info"]
+              failureThreshold: 24
+              periodSeconds: 5
+            resources:
+              requests:
+                cpu: 500m
+                memory: 2Gi
+              limits:
+                memory: 8Gi
+            volumeMounts:
+              - name: work
+                mountPath: /home/runner/_work
+              - name: dind-sock
+                mountPath: /var/run
+              - name: dind-externals
+                mountPath: /home/runner/externals
+              - name: docker-data
+                mountPath: /var/lib/docker
+        containers:
+          - name: runner
+            image: *runner
+            command: ["/home/runner/run.sh"]
+            env:
+              - name: DOCKER_HOST
+                value: unix:///var/run/docker.sock
+              - name: RUNNER_WAIT_FOR_DOCKER_IN_SECONDS
+                value: "120"
+            resources:
+              requests:
+                cpu: 500m
+                memory: 1Gi
+              limits:
+                memory: 6Gi
+            volumeMounts:
+              - name: work
+                mountPath: /home/runner/_work
+              - name: dind-sock
+                mountPath: /var/run
+        volumes:
+          - name: work
+            emptyDir:
+              sizeLimit: 20Gi
+          - name: dind-sock
+            emptyDir: {}
+          - name: dind-externals
+            emptyDir: {}
+          - name: docker-data
+            emptyDir:
+              sizeLimit: 30Gi
