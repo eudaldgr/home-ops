@@ -20,7 +20,7 @@ spec:
             image:
               repository: docker.io/itzg/minecraft-server
               # Forge 1.7.10 only runs on Java 8
-              tag: 2026.11.0-java8@sha256:91c8edad666c51ce0148022931dac327c973e6d8084cddb0e9090e2c60622f9c
+              tag: 2026.11.1-java8@sha256:0232f3834fc76ce6f3f5c034bac73e28d4f69b49e2eab6f9671ad845a095df3d
             env:
               TZ: Europe/Madrid
               EULA: "TRUE"
