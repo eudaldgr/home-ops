@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/eudaldgr-labs/seerr
-              tag: 3.3.0-r3@sha256:28dad592d337db1f41e46e281528d5e0c163aa71c413abac176987baa5ae4b2a
+              tag: 3.5.1-r3@sha256:198d226ed0bdd30c7d628e8c2c986bf113ffb069de3e2ebf84430bef7211eed3
             env:
               TZ: Europe/Madrid
               LOG_LEVEL: "info"
