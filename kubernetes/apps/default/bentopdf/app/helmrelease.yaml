@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/eudaldgr-labs/bentopdf
-              tag: 2.8.12-r0@sha256:a5595b4488fcdff0783c0e3c09a493402a57f67800648481bac0202252d19951
+              tag: 2.8.12-r0@sha256:2c3b78f647cb12220ebc8374dee7bdb615bbb3d2545826aed1a82f2138efa274
             env:
               TZ: Europe/Madrid
             probes:
