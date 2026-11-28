@@ -126,26 +126,26 @@ checksum = "sha256:6f3421de3a8cc2ac578c8cfb33b8edde290dde2871bc1bab12e24f2e5caea
 url = "https://get.helm.sh/helm-v4.3.2-darwin-arm64.tar.gz"
 
 [[tools.helmfile]]
-version = "1.8.5"
+version = "1.8.6"
 backend = "aqua:helmfile/helmfile"
-specifiers = ["1.8.5"]
+specifiers = ["1.8.6"]
 
 [tools.helmfile."platforms.linux-arm64"]
-checksum = "sha256:023b28a0630b60b392407f107b336502d11fec7e901dc631cfff7d2cc86a80c2"
-url = "https://github.com/helmfile/helmfile/releases/download/v1.8.5/helmfile_1.8.5_linux_arm64.tar.gz"
-url_api = "https://api.github.com/repos/helmfile/helmfile/releases/assets/780886000"
+checksum = "sha256:99badd01aeff4e0478e925f2d10c3307a4e9ce0630033c4a77629bdcaf27760d"
+url = "https://github.com/helmfile/helmfile/releases/download/v1.8.6/helmfile_1.8.6_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/helmfile/helmfile/releases/assets/803682870"
 provenance = "github-attestations"
 
 [tools.helmfile."platforms.linux-x64"]
-checksum = "sha256:e10344a4e6121689265c8fbe8ce96977b4722a9f953db862014a08b99938c333"
-url = "https://github.com/helmfile/helmfile/releases/download/v1.8.5/helmfile_1.8.5_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/helmfile/helmfile/releases/assets/780885994"
+checksum = "sha256:2018c1c2a9a5f113f298565ad65199bde2a9c8f9b417a5237d998e55a8fd157b"
+url = "https://github.com/helmfile/helmfile/releases/download/v1.8.6/helmfile_1.8.6_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/helmfile/helmfile/releases/assets/803683031"
 provenance = "github-attestations"
 
 [tools.helmfile."platforms.macos-arm64"]
-checksum = "sha256:aa8c5e0c0ebb331e5a3eacbe3ee4bacd45f8a0c6ef361a79dea23b7bf4c4a76f"
-url = "https://github.com/helmfile/helmfile/releases/download/v1.8.5/helmfile_1.8.5_darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/helmfile/helmfile/releases/assets/780885934"
+checksum = "sha256:1f36688ab92407f2eaf0fdd2f2daeefadc202d62790e56f629c833c794c751e8"
+url = "https://github.com/helmfile/helmfile/releases/download/v1.8.6/helmfile_1.8.6_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/helmfile/helmfile/releases/assets/803682873"
 provenance = "github-attestations"
 
 [[tools.jq]]
@@ -212,26 +212,26 @@ url = "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/
 url_api = "https://api.github.com/repos/kubernetes-sigs/kustomize/releases/assets/621661327"
 
 [[tools.lefthook]]
-version = "2.2.3"
+version = "2.2.4"
 backend = "aqua:evilmartians/lefthook"
-specifiers = ["2.2.3"]
+specifiers = ["2.2.4"]
 
 [tools.lefthook."platforms.linux-arm64"]
-checksum = "sha256:bec8af4e4eeeb55dc59928a632b3c53ae54fb84786cc72428db33b901158d629"
-url = "https://github.com/evilmartians/lefthook/releases/download/v2.2.3/lefthook_2.2.3_Linux_aarch64.gz"
-url_api = "https://api.github.com/repos/evilmartians/lefthook/releases/assets/786729111"
+checksum = "sha256:c3526916773c64e7a20a79aefd862b54eb3ec638762d2e32e054e576e9bfb08b"
+url = "https://github.com/evilmartians/lefthook/releases/download/v2.2.4/lefthook_2.2.4_Linux_aarch64.gz"
+url_api = "https://api.github.com/repos/evilmartians/lefthook/releases/assets/795193026"
 provenance = "github-attestations"
 
 [tools.lefthook."platforms.linux-x64"]
-checksum = "sha256:f25a53b1991c2727aa2819fdd7a4b9798fc0c210d1e1a92f035be8f346cec9fb"
-url = "https://github.com/evilmartians/lefthook/releases/download/v2.2.3/lefthook_2.2.3_Linux_x86_64.gz"
-url_api = "https://api.github.com/repos/evilmartians/lefthook/releases/assets/786728948"
+checksum = "sha256:d2ab071d60703a3d3fdc3ea4ac4172cc151a97a3623b83f1003ce1a8eb68e2b3"
+url = "https://github.com/evilmartians/lefthook/releases/download/v2.2.4/lefthook_2.2.4_Linux_x86_64.gz"
+url_api = "https://api.github.com/repos/evilmartians/lefthook/releases/assets/795192860"
 provenance = "github-attestations"
 
 [tools.lefthook."platforms.macos-arm64"]
-checksum = "sha256:ac57c55fa405c11afe9be7a733ab7d9e81ae5afa71e3588105b7d7aa3c7025ae"
-url = "https://github.com/evilmartians/lefthook/releases/download/v2.2.3/lefthook_2.2.3_MacOS_arm64.gz"
-url_api = "https://api.github.com/repos/evilmartians/lefthook/releases/assets/786728907"
+checksum = "sha256:d021736a6f73d308f65284f64b162675c8c579ee88baa8fd278c51c73edf7c40"
+url = "https://github.com/evilmartians/lefthook/releases/download/v2.2.4/lefthook_2.2.4_MacOS_arm64.gz"
+url_api = "https://api.github.com/repos/evilmartians/lefthook/releases/assets/795192785"
 provenance = "github-attestations"
 
 [[tools.node]]
